@@ -1,9 +1,11 @@
+import { motion } from "framer-motion";
 import { Download, GitBranch, ShieldCheck, FileCode, Info } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import ScrollReveal, { StaggerContainer, StaggerItem } from "./animations/ScrollReveal";
 
 const steps = [
   {
@@ -63,12 +65,11 @@ const steps = [
 const MechanismSection = () => {
   return (
     <section className="relative py-24 bg-card/30">
-      {/* Background */}
       <div className="absolute inset-0 grid-overlay opacity-30" />
       
       <div className="relative container mx-auto px-6">
         {/* Section Header */}
-        <div className="text-center mb-16 opacity-0 animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
+        <ScrollReveal className="text-center mb-16">
           <span className="inline-block px-4 py-1.5 rounded-full bg-secondary/50 border border-border/50 text-xs font-mono uppercase tracking-widest text-muted-foreground mb-4">
             Mechanism of Action
           </span>
@@ -78,31 +79,42 @@ const MechanismSection = () => {
           <p className="text-muted-foreground max-w-2xl mx-auto">
             The Standardized Rail methodology ensures complete traceability from legacy formats to FDA-compliant outputs.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Steps Timeline */}
         <div className="relative">
           {/* Connector Line (desktop) */}
-          <div className="hidden lg:block absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-border to-transparent" />
+          <motion.div 
+            className="hidden lg:block absolute top-16 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-border to-transparent"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.3 }}
+          />
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((step, index) => (
-              <div
-                key={step.number}
-                className="relative opacity-0 animate-slide-up"
-                style={{ animationDelay: `${index * 150 + 200}ms`, animationFillMode: 'forwards' }}
-              >
-                {/* Step Card */}
-                <div className="flex flex-col items-center text-center p-6 rounded-xl border border-border/40 bg-background/50 backdrop-blur-sm hover:border-primary/30 transition-all duration-300 group">
+          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" staggerDelay={0.15}>
+            {steps.map((step) => (
+              <StaggerItem key={step.number}>
+                <motion.div 
+                  className="flex flex-col items-center text-center p-6 rounded-xl border border-border/40 bg-background/50 backdrop-blur-sm group h-full"
+                  whileHover={{ 
+                    borderColor: "hsl(var(--primary) / 0.3)",
+                    y: -4,
+                  }}
+                  transition={{ duration: 0.2 }}
+                >
                   {/* Step Number */}
                   <div className="relative mb-6">
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-                      step.color === 'success' 
-                        ? 'bg-success/10 border border-success/30 group-hover:border-success/50' 
-                        : 'bg-primary/10 border border-primary/30 group-hover:border-primary/50'
-                    }`}>
+                    <motion.div 
+                      className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                        step.color === 'success' 
+                          ? 'bg-success/10 border border-success/30 group-hover:border-success/50' 
+                          : 'bg-primary/10 border border-primary/30 group-hover:border-primary/50'
+                      }`}
+                      whileHover={{ scale: 1.05 }}
+                    >
                       <step.icon className={`w-7 h-7 ${step.color === 'success' ? 'text-success' : 'text-primary'}`} />
-                    </div>
+                    </motion.div>
                     <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-secondary border border-border flex items-center justify-center text-xs font-mono font-bold text-foreground">
                       {step.number}
                     </span>
@@ -111,26 +123,17 @@ const MechanismSection = () => {
                   {/* Title */}
                   <h3 className="text-lg font-semibold text-foreground mb-2">
                     {step.title}
-                    {step.titleExtra && (
-                      <span className="ml-1">{step.titleExtra}</span>
-                    )}
+                    {step.titleExtra && <span className="ml-1">{step.titleExtra}</span>}
                   </h3>
 
                   {/* Description */}
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    {step.titleExtra ? step.description : step.description}
+                    {step.description}
                   </p>
-                </div>
-
-                {/* Connector Arrow (mobile/tablet) */}
-                {index < steps.length - 1 && (
-                  <div className="lg:hidden flex justify-center my-4">
-                    <div className="w-0.5 h-8 bg-border/50" />
-                  </div>
-                )}
-              </div>
+                </motion.div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </div>
     </section>

@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import NavigationHeader from "@/components/NavigationHeader";
 import HeroSection from "@/components/HeroSection";
 import ProofSection from "@/components/ProofSection";
@@ -8,17 +9,25 @@ import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <main className="min-h-screen bg-background">
-      <NavigationHeader />
-      <div className="pt-16">
-        <HeroSection />
-        <ProofSection />
-        <MechanismSection />
-        <ArchitectureDiagram />
-        <DemoSection />
-        <Footer />
-      </div>
-    </main>
+    <AnimatePresence mode="wait">
+      <motion.main 
+        className="min-h-screen bg-background"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <NavigationHeader />
+        <div className="pt-16">
+          <HeroSection />
+          <ProofSection />
+          <MechanismSection />
+          <ArchitectureDiagram />
+          <DemoSection />
+          <Footer />
+        </div>
+      </motion.main>
+    </AnimatePresence>
   );
 };
 

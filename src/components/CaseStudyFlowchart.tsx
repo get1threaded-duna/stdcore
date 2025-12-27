@@ -1,53 +1,110 @@
+import { motion } from "framer-motion";
 import { FileWarning, ArrowRight, CheckCircle2, Database } from "lucide-react";
 
 const CaseStudyFlowchart = () => {
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 py-8">
+    <motion.div 
+      className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 py-8"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, staggerChildren: 0.2 }}
+    >
       {/* Node 1: Messy Legacy Files */}
-      <div className="flex flex-col items-center gap-3 opacity-0 animate-slide-up" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
-        <div className="w-20 h-20 rounded-xl bg-error/10 border border-error/30 flex items-center justify-center">
+      <motion.div 
+        className="flex flex-col items-center gap-3"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+      >
+        <motion.div 
+          className="w-20 h-20 rounded-xl bg-error/10 border border-error/30 flex items-center justify-center"
+          whileHover={{ scale: 1.05 }}
+        >
           <FileWarning className="w-9 h-9 text-error" />
-        </div>
+        </motion.div>
         <div className="text-center">
           <span className="text-sm font-medium text-foreground block">Messy Legacy</span>
           <span className="text-xs text-muted-foreground">v3.2 Files</span>
         </div>
-      </div>
+      </motion.div>
 
       {/* Arrow 1 */}
-      <div className="opacity-0 animate-fade-in" style={{ animationDelay: '600ms', animationFillMode: 'forwards' }}>
-        <ArrowRight className="w-8 h-8 text-muted-foreground rotate-90 md:rotate-0" />
-      </div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.3, delay: 0.2 }}
+      >
+        <motion.div
+          animate={{ x: [0, 5, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        >
+          <ArrowRight className="w-8 h-8 text-muted-foreground rotate-90 md:rotate-0" />
+        </motion.div>
+      </motion.div>
 
       {/* Node 2: StandardCore Bridge */}
-      <div className="flex flex-col items-center gap-3 opacity-0 animate-slide-up" style={{ animationDelay: '500ms', animationFillMode: 'forwards' }}>
-        <div className="w-24 h-20 rounded-xl bg-primary/10 border border-primary/40 flex items-center justify-center relative overflow-hidden">
-          <Database className="w-9 h-9 text-primary" />
-          {/* Animated processing indicator */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent animate-pulse-glow" />
-        </div>
+      <motion.div 
+        className="flex flex-col items-center gap-3"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        <motion.div 
+          className="w-24 h-20 rounded-xl bg-primary/10 border border-primary/40 flex items-center justify-center relative overflow-hidden"
+          whileHover={{ scale: 1.05 }}
+        >
+          <Database className="w-9 h-9 text-primary relative z-10" />
+          <motion.div 
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent"
+            animate={{ x: ["-100%", "100%"] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          />
+        </motion.div>
         <div className="text-center">
           <span className="text-sm font-medium text-primary block">StandardCore</span>
           <span className="text-xs text-muted-foreground">Bridge Engine</span>
         </div>
-      </div>
+      </motion.div>
 
       {/* Arrow 2 */}
-      <div className="opacity-0 animate-fade-in" style={{ animationDelay: '700ms', animationFillMode: 'forwards' }}>
-        <ArrowRight className="w-8 h-8 text-muted-foreground rotate-90 md:rotate-0" />
-      </div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.3, delay: 0.4 }}
+      >
+        <motion.div
+          animate={{ x: [0, 5, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
+        >
+          <ArrowRight className="w-8 h-8 text-muted-foreground rotate-90 md:rotate-0" />
+        </motion.div>
+      </motion.div>
 
       {/* Node 3: Validated XML */}
-      <div className="flex flex-col items-center gap-3 opacity-0 animate-slide-up" style={{ animationDelay: '600ms', animationFillMode: 'forwards' }}>
-        <div className="w-20 h-20 rounded-xl bg-success/10 border border-success/30 flex items-center justify-center">
+      <motion.div 
+        className="flex flex-col items-center gap-3"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+        <motion.div 
+          className="w-20 h-20 rounded-xl bg-success/10 border border-success/30 flex items-center justify-center"
+          whileHover={{ scale: 1.05 }}
+        >
           <CheckCircle2 className="w-9 h-9 text-success" />
-        </div>
+        </motion.div>
         <div className="text-center">
           <span className="text-sm font-medium text-foreground block">Validated XML</span>
           <span className="text-xs text-muted-foreground">v4.0 Native</span>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

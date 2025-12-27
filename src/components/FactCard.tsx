@@ -1,14 +1,20 @@
+import { motion } from "framer-motion";
+
 interface FactCardProps {
   title: string;
   text: string;
   index: number;
 }
 
-const FactCard = ({ title, text, index }: FactCardProps) => {
+const FactCard = ({ title, text }: FactCardProps) => {
   return (
-    <div
-      className="p-6 border border-border/40 rounded-lg bg-card/30 backdrop-blur-sm hover:border-primary/30 transition-colors duration-300 opacity-0 animate-slide-up"
-      style={{ animationDelay: `${index * 100 + 200}ms`, animationFillMode: 'forwards' }}
+    <motion.div
+      className="p-6 border border-border/40 rounded-lg bg-card/30 backdrop-blur-sm transition-colors duration-300 h-full"
+      whileHover={{ 
+        borderColor: "hsl(var(--primary) / 0.3)",
+        y: -4,
+      }}
+      transition={{ duration: 0.2 }}
     >
       <h3 className="text-xl font-semibold text-foreground mb-3">
         {title}
@@ -16,7 +22,7 @@ const FactCard = ({ title, text, index }: FactCardProps) => {
       <p className="text-muted-foreground leading-relaxed">
         {text}
       </p>
-    </div>
+    </motion.div>
   );
 };
 

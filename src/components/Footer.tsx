@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Shield, FileCheck, Lock, Heart, Mail, Phone, MapPin, Linkedin, Twitter } from "lucide-react";
 import NewsletterSignup from "./NewsletterSignup";
 
@@ -42,7 +43,13 @@ const Footer = () => {
       <div className="container mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12">
           {/* Brand & Newsletter */}
-          <div className="lg:col-span-2 space-y-6">
+          <motion.div 
+            className="lg:col-span-2 space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
             <a href="/" className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/40 flex items-center justify-center">
                 <span className="text-primary font-bold text-sm">SC</span>
@@ -63,61 +70,91 @@ const Footer = () => {
                 Monthly insights on eCTD, ESG, and compliance standards.
               </p>
             </div>
-          </div>
+          </motion.div>
 
           {/* Platform Links */}
-          <div className="space-y-4">
+          <motion.div 
+            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
             <h4 className="text-sm font-semibold text-foreground">Platform</h4>
             <ul className="space-y-3">
               {footerLinks.platform.map((link) => (
                 <li key={link.label}>
-                  <a
+                  <motion.a
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    whileHover={{ x: 4 }}
+                    transition={{ duration: 0.2 }}
                   >
                     {link.label}
-                  </a>
+                  </motion.a>
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Resources Links */}
-          <div className="space-y-4">
+          <motion.div 
+            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+          >
             <h4 className="text-sm font-semibold text-foreground">Resources</h4>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
-                  <a
+                  <motion.a
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    whileHover={{ x: 4 }}
+                    transition={{ duration: 0.2 }}
                   >
                     {link.label}
-                  </a>
+                  </motion.a>
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Regulatory Links */}
-          <div className="space-y-4">
+          <motion.div 
+            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             <h4 className="text-sm font-semibold text-foreground">Regulatory</h4>
             <ul className="space-y-3">
               {footerLinks.regulatory.map((link) => (
                 <li key={link.label}>
-                  <a
+                  <motion.a
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    whileHover={{ x: 4 }}
+                    transition={{ duration: 0.2 }}
                   >
                     {link.label}
-                  </a>
+                  </motion.a>
                 </li>
               ))}
             </ul>
-          </div>
+          </motion.div>
 
           {/* Contact Info */}
-          <div className="space-y-4">
+          <motion.div 
+            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.25 }}
+          >
             <h4 className="text-sm font-semibold text-foreground">Contact</h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -138,38 +175,56 @@ const Footer = () => {
             
             {/* Social Links */}
             <div className="flex gap-3 pt-2">
-              <a
+              <motion.a
                 href="#"
                 className="w-8 h-8 rounded-lg bg-secondary/50 border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <Linkedin className="w-4 h-4" />
-              </a>
-              <a
+              </motion.a>
+              <motion.a
                 href="#"
                 className="w-8 h-8 rounded-lg bg-secondary/50 border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <Twitter className="w-4 h-4" />
-              </a>
+              </motion.a>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Certifications Bar */}
-        <div className="mt-12 pt-8 border-t border-border/30">
+        <motion.div 
+          className="mt-12 pt-8 border-t border-border/30"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex flex-wrap items-center justify-center gap-6">
-              {certifications.map((cert) => (
-                <div key={cert.label} className="flex items-center gap-2">
+              {certifications.map((cert, index) => (
+                <motion.div 
+                  key={cert.label} 
+                  className="flex items-center gap-2"
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 + index * 0.05 }}
+                  whileHover={{ y: -2 }}
+                >
                   <cert.icon className="w-4 h-4 text-muted-foreground" />
                   <span className="text-xs font-medium text-muted-foreground">{cert.label}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
             <div className="text-xs text-muted-foreground">
               Validated for FDA, EMA, PMDA, and Health Canada submissions
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Bottom Bar */}
@@ -178,11 +233,16 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
             <p>© {new Date().getFullYear()} StandardCore, Inc. All rights reserved.</p>
             <div className="flex flex-wrap items-center justify-center gap-6">
-              <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-foreground transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-foreground transition-colors">Cookie Policy</a>
-              <a href="#" className="hover:text-foreground transition-colors">Security</a>
-              <a href="#" className="hover:text-foreground transition-colors">Accessibility</a>
+              {["Privacy Policy", "Terms of Service", "Cookie Policy", "Security", "Accessibility"].map((link) => (
+                <motion.a 
+                  key={link} 
+                  href="#" 
+                  className="hover:text-foreground transition-colors"
+                  whileHover={{ y: -1 }}
+                >
+                  {link}
+                </motion.a>
+              ))}
             </div>
           </div>
         </div>

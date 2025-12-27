@@ -5,6 +5,7 @@ import ProofSection from "@/components/ProofSection";
 import MechanismSection from "@/components/MechanismSection";
 import ArchitectureDiagram from "@/components/ArchitectureDiagram";
 import DemoSection from "@/components/DemoSection";
+import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -23,6 +24,7 @@ const Index = () => {
           <ProofSection />
           <MechanismSection />
           <ArchitectureDiagram />
+          <FAQSection />
           <DemoSection />
           <Footer />
         </div>

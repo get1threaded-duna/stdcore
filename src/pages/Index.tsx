@@ -19,13 +19,21 @@ const Index = () => {
         transition={{ duration: 0.3 }}
       >
         <NavigationHeader />
-        <div className="pt-16">
-          <HeroSection />
-          <ProofSection />
-          <MechanismSection />
-          <ArchitectureDiagram />
-          <FAQSection />
-          <DemoSection />
+        <div className="pt-16 scroll-smooth">
+          <section id="platform">
+            <HeroSection />
+          </section>
+          <section id="solutions">
+            <ProofSection />
+            <MechanismSection />
+          </section>
+          <section id="resources">
+            <ArchitectureDiagram />
+            <FAQSection />
+          </section>
+          <section id="pricing">
+            <DemoSection />
+          </section>
           <Footer />
         </div>
       </motion.main>

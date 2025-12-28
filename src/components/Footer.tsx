@@ -25,7 +25,7 @@ const footerLinks = {
   company: [
     { label: "About Us", href: "#" },
     { label: "Careers", href: "#" },
-    { label: "Contact", href: "#" },
+    { label: "Contact", href: "/contact", isRoute: true },
     { label: "Press Kit", href: "#" },
   ],
 };
@@ -254,13 +254,11 @@ const Footer = () => {
                   Security
                 </Link>
               </motion.div>
-              <motion.a 
-                href="#" 
-                className="hover:text-foreground transition-colors"
-                whileHover={{ y: -1 }}
-              >
-                Accessibility
-              </motion.a>
+              <motion.div whileHover={{ y: -1 }}>
+                <Link to="/accessibility" className="hover:text-foreground transition-colors">
+                  Accessibility
+                </Link>
+              </motion.div>
             </div>
           </div>
         </div>

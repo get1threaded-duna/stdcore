@@ -7,6 +7,7 @@ import ArchitectureDiagram from "@/components/ArchitectureDiagram";
 import DemoSection from "@/components/DemoSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const Index = () => {
   return (
@@ -36,6 +37,7 @@ const Index = () => {
           </section>
           <Footer />
         </div>
+        <ScrollToTop />
       </motion.main>
     </AnimatePresence>
   );

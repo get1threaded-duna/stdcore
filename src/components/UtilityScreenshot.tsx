@@ -27,9 +27,9 @@ const UtilityScreenshot = () => {
       </div>
 
       {/* Main Content */}
-      <div className="p-6 space-y-6">
+      <div className="p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Top Stats Bar */}
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
           {[
             { label: "Documents Processed", value: "12,847", icon: FileCheck, color: "text-primary" },
             { label: "OIDs Validated", value: "1,234", icon: Shield, color: "text-success" },
@@ -54,7 +54,7 @@ const UtilityScreenshot = () => {
         </div>
 
         {/* Processing Pipeline Visualization */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
           {/* Input Panel */}
           <div className="p-4 rounded-lg bg-muted/20 border border-border/30">
             <div className="flex items-center gap-2 mb-3">
@@ -149,18 +149,18 @@ const UtilityScreenshot = () => {
         </div>
 
         {/* Bottom Status */}
-        <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border border-border/30">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-0 p-3 rounded-lg bg-secondary/20 border border-border/30">
+          <div className="flex flex-wrap items-center gap-3 md:gap-4">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span className="text-xs text-muted-foreground">21 CFR Part 11 Compliant</span>
+              <span className="text-xs text-muted-foreground">21 CFR Part 11</span>
             </div>
             <div className="flex items-center gap-2">
               <Shield className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">VPC Isolated</span>
             </div>
           </div>
-          <span className="text-xs font-mono text-muted-foreground">Last sync: 2 seconds ago</span>
+          <span className="text-xs font-mono text-muted-foreground">Last sync: 2s ago</span>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Shield, FileCheck, Lock, Heart, Mail, Phone, MapPin, Linkedin, Twitter } from "lucide-react";
+import { Link } from "react-router-dom";
 import NewsletterSignup from "./NewsletterSignup";
 
 const footerLinks = {
@@ -233,16 +234,33 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
             <p>© {new Date().getFullYear()} StandardCore, Inc. All rights reserved.</p>
             <div className="flex flex-wrap items-center justify-center gap-6">
-              {["Privacy Policy", "Terms of Service", "Cookie Policy", "Security", "Accessibility"].map((link) => (
-                <motion.a 
-                  key={link} 
-                  href="#" 
-                  className="hover:text-foreground transition-colors"
-                  whileHover={{ y: -1 }}
-                >
-                  {link}
-                </motion.a>
-              ))}
+              <motion.div whileHover={{ y: -1 }}>
+                <Link to="/privacy" className="hover:text-foreground transition-colors">
+                  Privacy Policy
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ y: -1 }}>
+                <Link to="/terms" className="hover:text-foreground transition-colors">
+                  Terms of Service
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ y: -1 }}>
+                <Link to="/cookies" className="hover:text-foreground transition-colors">
+                  Cookie Policy
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ y: -1 }}>
+                <Link to="/security" className="hover:text-foreground transition-colors">
+                  Security
+                </Link>
+              </motion.div>
+              <motion.a 
+                href="#" 
+                className="hover:text-foreground transition-colors"
+                whileHover={{ y: -1 }}
+              >
+                Accessibility
+              </motion.a>
             </div>
           </div>
         </div>

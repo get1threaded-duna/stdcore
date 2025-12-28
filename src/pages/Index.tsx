@@ -47,6 +47,44 @@ const Index = () => {
     }
   };
 
+  // BreadcrumbList JSON-LD schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://standardcore.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Platform",
+        "item": "https://standardcore.com/#platform"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Solutions",
+        "item": "https://standardcore.com/#solutions"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "Resources",
+        "item": "https://standardcore.com/#resources"
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "name": "Pricing",
+        "item": "https://standardcore.com/#pricing"
+      }
+    ]
+  };
+
   return (
     <AnimatePresence mode="wait">
       <motion.main 
@@ -64,6 +102,10 @@ const Index = () => {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
         />
         
         <NavigationHeader />

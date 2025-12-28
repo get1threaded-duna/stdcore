@@ -84,8 +84,30 @@ const faqData = [
 ];
 
 const FAQSection = () => {
+  // Generate JSON-LD FAQ schema for SEO
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqData.flatMap(category =>
+      category.questions.map(faq => ({
+        "@type": "Question",
+        "name": faq.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.answer
+        }
+      }))
+    )
+  };
+
   return (
     <section id="faq" className="py-24 bg-muted/30">
+      {/* JSON-LD structured data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      
       <div className="container mx-auto px-6 max-w-5xl">
         <ScrollReveal>
           <div className="text-center mb-16">

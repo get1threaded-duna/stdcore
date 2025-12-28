@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import DeterministicToggle from "./DeterministicToggle";
 import ComplianceRibbon from "./ComplianceRibbon";
 
+// External Utility Project URL
+const UTILITY_APP_URL = "https://id-preview--1c7bab28-ee3b-47e1-9fa7-54c85e1eddaf.lovable.app";
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex flex-col">
@@ -81,10 +83,12 @@ const HeroSection = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <Button variant="hero" size="xl" className="group">
-              <Lock className="w-5 h-5 mr-1" />
-              Access Master Vault (Data Room)
-              <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
+            <Button variant="hero" size="xl" className="group" asChild>
+              <a href={UTILITY_APP_URL} target="_blank" rel="noopener noreferrer">
+                <Lock className="w-5 h-5 mr-1" />
+                Access Master Vault (Data Room)
+                <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
+              </a>
             </Button>
           </motion.div>
         </motion.div>

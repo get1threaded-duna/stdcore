@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Menu, X } from "lucide-react";
+import { Lock, Menu, X, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+// External Utility Project URL
+const UTILITY_APP_URL = "https://id-preview--1c7bab28-ee3b-47e1-9fa7-54c85e1eddaf.lovable.app";
 const navItems = [
   { label: "Platform", href: "#platform" },
   { label: "Solutions", href: "#solutions" },
@@ -99,8 +101,15 @@ const NavigationHeader = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            <Button variant="ghost" size="sm">
-              Login
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              asChild
+            >
+              <a href={UTILITY_APP_URL} target="_blank" rel="noopener noreferrer">
+                Login
+                <ExternalLink className="w-3 h-3 ml-1.5 opacity-50" />
+              </a>
             </Button>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button variant="default" size="sm">
@@ -178,8 +187,11 @@ const NavigationHeader = () => {
                 ))}
               </nav>
               <div className="flex flex-col gap-2 px-4">
-                <Button variant="ghost" size="sm" className="justify-start">
-                  Login
+                <Button variant="ghost" size="sm" className="justify-start" asChild>
+                  <a href={UTILITY_APP_URL} target="_blank" rel="noopener noreferrer">
+                    Login
+                    <ExternalLink className="w-3 h-3 ml-1.5 opacity-50" />
+                  </a>
                 </Button>
                 <Button variant="default" size="sm">
                   <Lock className="w-3.5 h-3.5 mr-1.5" />

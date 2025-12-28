@@ -6,9 +6,19 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Clock, Shield, Lock, FileCheck, AlertTriangle, RefreshCw } from "lucide-react";
+import { Clock, Shield, Lock, FileCheck, AlertTriangle, RefreshCw, Cpu } from "lucide-react";
 
 const faqData = [
+  {
+    category: "Technical Architecture",
+    icon: Cpu,
+    questions: [
+      {
+        question: "How does StandardCore ensure \"Zero-Hallucination\" in OID mapping?",
+        answer: "Unlike LLM-wrappers that \"guess\" the most likely XML tag, StandardCore uses a Dual-Gate Architecture. AI is used only for initial unstructured data extraction. The extracted data is then passed through a Deterministic Validator—a proprietary, hard-coded matrix of 1,500+ FDA-recognized Object Identifiers (OIDs). If a 100% binary match isn't found, the system halts. We prioritize Integrity over Autonomy."
+      }
+    ]
+  },
   {
     category: "Migration Timelines",
     icon: Clock,
@@ -24,6 +34,10 @@ const faqData = [
       {
         question: "What's the cutoff date for mandatory eCTD v4.0 adoption?",
         answer: "FDA's ESG NextGen platform mandates eCTD v4.0 by Q4 2025. EMA follows with mandatory adoption in 2026. StandardCore recommends beginning migration 12 months prior to ensure validation cycles complete before regulatory deadlines."
+      },
+      {
+        question: "How do you handle legacy v3.2 \"Replacement\" logic in v4.0?",
+        answer: "We use a Relational Lifecycle Graph. In v3.2, document relationships were implied by folder paths. StandardCore's Legacy Bridge extracts these historical paths and calculates a Deterministic UUID v5 for every asset. This creates a persistent \"Chain of Custody\" that allows v4.0 messages to accurately reference documents submitted 20 years ago."
       }
     ]
   },
@@ -32,8 +46,8 @@ const faqData = [
     icon: FileCheck,
     questions: [
       {
-        question: "Does StandardCore meet 21 CFR Part 11 requirements?",
-        answer: "StandardCore is fully compliant with 21 CFR Part 11 electronic records and signatures requirements. Our platform includes audit trails, electronic signatures with biometric authentication, and tamper-evident logging for all submission activities."
+        question: "Is StandardCore 21 CFR Part 11 compliant?",
+        answer: "Yes. Every action taken by the engine is time-stamped, attributed, and stored in an Immutable Audit Ledger with HMAC-SHA256 signatures, ensuring total auditability for FDA inspections."
       },
       {
         question: "How do you handle EU Annex 11 validation?",
@@ -49,6 +63,10 @@ const faqData = [
     category: "Security Protocols",
     icon: Lock,
     questions: [
+      {
+        question: "Does my clinical data leave my VPC?",
+        answer: "No. StandardCore utilizes a Federated Agent architecture. The core logic engine is containerized and deployed within your secure Virtual Private Cloud (VPC). We process the metadata locally and only send anonymized \"Verification Hashes\" to our central ledger to maintain the audit trail."
+      },
       {
         question: "What encryption standards protect our submission data?",
         answer: "All data is encrypted using AES-256 at rest and TLS 1.3 in transit. Our key management follows NIST 800-57 guidelines with hardware security modules (HSMs) for cryptographic key storage. Zero-knowledge architecture ensures even StandardCore personnel cannot access your submission content."

@@ -53,8 +53,8 @@ const UtilityScreenshot = () => {
           ))}
         </div>
 
-        {/* Processing Pipeline Visualization */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+        {/* Processing Pipeline Visualization - Hidden on Mobile */}
+        <div className="hidden md:grid md:grid-cols-3 gap-3 md:gap-4">
           {/* Input Panel */}
           <div className="p-4 rounded-lg bg-muted/20 border border-border/30">
             <div className="flex items-center gap-2 mb-3">
@@ -145,6 +145,34 @@ const UtilityScreenshot = () => {
             <div className="mt-4 p-3 rounded-lg bg-success/10 border border-success/30 text-center">
               <span className="text-xs font-medium text-success">ESG NextGen Ready</span>
             </div>
+          </div>
+        </div>
+
+        {/* Mobile Simplified View */}
+        <div className="md:hidden p-4 rounded-lg bg-primary/5 border border-primary/20">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-foreground">Processing Active</span>
+            </div>
+            <motion.div
+              className="w-2 h-2 rounded-full bg-success"
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-center">
+            <div className="p-3 rounded bg-secondary/30">
+              <div className="text-lg font-bold text-success">1,500+</div>
+              <div className="text-xs text-muted-foreground">OID Matrix</div>
+            </div>
+            <div className="p-3 rounded bg-secondary/30">
+              <div className="text-lg font-bold text-primary">100%</div>
+              <div className="text-xs text-muted-foreground">Binary Match</div>
+            </div>
+          </div>
+          <div className="mt-3 p-2 rounded-lg bg-success/10 border border-success/30 text-center">
+            <span className="text-xs font-medium text-success">ESG NextGen Ready</span>
           </div>
         </div>
 

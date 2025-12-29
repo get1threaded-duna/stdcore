@@ -11,8 +11,10 @@ import { useToast } from "@/hooks/use-toast";
 import LeadDetailModal from "@/components/LeadDetailModal";
 import { 
   LogOut, Download, Search, Filter, Mail, Calendar,
-  Building, TrendingUp, Users, DollarSign, RefreshCw, Eye, Send, Trash2
+  Building, TrendingUp, Users, DollarSign, RefreshCw, Eye, Send, Trash2,
+  ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -59,6 +61,9 @@ interface EmailRecord {
   email_type: string;
 }
 
+type SortField = 'name' | 'company' | 'velocity_score' | 'financial_risk' | 'data_architecture' | 'created_at';
+type SortDirection = 'asc' | 'desc';
+
 const AdminLeads = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -79,6 +84,11 @@ const AdminLeads = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [selectedLeadIds, setSelectedLeadIds] = useState<Set<string>>(new Set());
+  const [sortField, setSortField] = useState<SortField>('created_at');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -175,6 +185,124 @@ const AdminLeads = () => {
       return matchesSearch && matchesDateFrom && matchesDateTo && matchesMinScore && matchesMaxScore && matchesGrade && matchesArchitecture;
     });
   }, [leads, searchTerm, dateFrom, dateTo, minScore, maxScore, velocityGradeFilter, dataArchitectureFilter]);
+
+  // Sorted leads
+  const sortedLeads = useMemo(() => {
+    return [...filteredLeads].sort((a, b) => {
+      let aVal: any, bVal: any;
+      
+      switch (sortField) {
+        case 'name':
+          aVal = a.name?.toLowerCase() || '';
+          bVal = b.name?.toLowerCase() || '';
+          break;
+        case 'company':
+          aVal = a.company?.toLowerCase() || '';
+          bVal = b.company?.toLowerCase() || '';
+          break;
+        case 'velocity_score':
+          aVal = a.velocity_score || 0;
+          bVal = b.velocity_score || 0;
+          break;
+        case 'financial_risk':
+          aVal = a.financial_risk || 0;
+          bVal = b.financial_risk || 0;
+          break;
+        case 'data_architecture':
+          aVal = a.data_architecture || '';
+          bVal = b.data_architecture || '';
+          break;
+        case 'created_at':
+          aVal = new Date(a.created_at).getTime();
+          bVal = new Date(b.created_at).getTime();
+          break;
+        default:
+          return 0;
+      }
+      
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [filteredLeads, sortField, sortDirection]);
+
+  // Paginated leads
+  const totalPages = Math.ceil(sortedLeads.length / pageSize);
+  const paginatedLeads = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    return sortedLeads.slice(startIndex, startIndex + pageSize);
+  }, [sortedLeads, currentPage, pageSize]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, dateFrom, dateTo, minScore, maxScore, velocityGradeFilter, dataArchitectureFilter]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) return <ArrowUpDown className="h-4 w-4 ml-1 opacity-50" />;
+    return sortDirection === 'asc' 
+      ? <ArrowUp className="h-4 w-4 ml-1" /> 
+      : <ArrowDown className="h-4 w-4 ml-1" />;
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedLeadIds(new Set(paginatedLeads.map(l => l.id)));
+    } else {
+      setSelectedLeadIds(new Set());
+    }
+  };
+
+  const handleSelectLead = (leadId: string, checked: boolean) => {
+    const newSet = new Set(selectedLeadIds);
+    if (checked) {
+      newSet.add(leadId);
+    } else {
+      newSet.delete(leadId);
+    }
+    setSelectedLeadIds(newSet);
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedLeadIds.size === 0) return;
+    
+    setIsBulkDeleting(true);
+    try {
+      const leadIds = Array.from(selectedLeadIds);
+      
+      const { error } = await supabase
+        .from('calculator_leads')
+        .delete()
+        .in('id', leadIds);
+
+      if (error) throw error;
+
+      setLeads(leads.filter(l => !selectedLeadIds.has(l.id)));
+      setSelectedLeadIds(new Set());
+      toast({
+        title: "Delete Complete",
+        description: `Successfully deleted ${leadIds.length} leads`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete leads",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBulkDeleting(false);
+      setShowBulkDeleteConfirm(false);
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -544,7 +672,11 @@ const AdminLeads = () => {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-lg">Leads</CardTitle>
-              <CardDescription>{filteredLeads.length} results</CardDescription>
+              <CardDescription>
+                {selectedLeadIds.size > 0 
+                  ? `${selectedLeadIds.size} selected of ${filteredLeads.length} results`
+                  : `${filteredLeads.length} results`}
+              </CardDescription>
             </div>
             <div className="flex gap-2 flex-wrap">
               <Button variant="outline" onClick={fetchLeads} disabled={isLoading}>
@@ -559,14 +691,24 @@ const AdminLeads = () => {
                 <Download className="mr-2 h-4 w-4" />
                 Export CSV
               </Button>
-              <Button 
-                variant="destructive" 
-                onClick={() => setShowBulkDeleteConfirm(true)} 
-                disabled={filteredLeads.length === 0}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete All ({filteredLeads.length})
-              </Button>
+              {selectedLeadIds.size > 0 ? (
+                <Button 
+                  variant="destructive" 
+                  onClick={() => setShowBulkDeleteConfirm(true)} 
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Selected ({selectedLeadIds.size})
+                </Button>
+              ) : (
+                <Button 
+                  variant="destructive" 
+                  onClick={() => setShowBulkDeleteConfirm(true)} 
+                  disabled={filteredLeads.length === 0}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete All ({filteredLeads.length})
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
@@ -583,18 +725,74 @@ const AdminLeads = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Contact</TableHead>
-                      <TableHead>Company</TableHead>
-                      <TableHead>Score</TableHead>
-                      <TableHead>Risk</TableHead>
-                      <TableHead>Architecture</TableHead>
-                      <TableHead>Date</TableHead>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={paginatedLeads.length > 0 && paginatedLeads.every(l => selectedLeadIds.has(l.id))}
+                          onCheckedChange={handleSelectAll}
+                          aria-label="Select all"
+                        />
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer select-none hover:bg-secondary/50"
+                        onClick={() => handleSort('name')}
+                      >
+                        <div className="flex items-center">
+                          Contact {getSortIcon('name')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer select-none hover:bg-secondary/50"
+                        onClick={() => handleSort('company')}
+                      >
+                        <div className="flex items-center">
+                          Company {getSortIcon('company')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer select-none hover:bg-secondary/50"
+                        onClick={() => handleSort('velocity_score')}
+                      >
+                        <div className="flex items-center">
+                          Score {getSortIcon('velocity_score')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer select-none hover:bg-secondary/50"
+                        onClick={() => handleSort('financial_risk')}
+                      >
+                        <div className="flex items-center">
+                          Risk {getSortIcon('financial_risk')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer select-none hover:bg-secondary/50"
+                        onClick={() => handleSort('data_architecture')}
+                      >
+                        <div className="flex items-center">
+                          Architecture {getSortIcon('data_architecture')}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer select-none hover:bg-secondary/50"
+                        onClick={() => handleSort('created_at')}
+                      >
+                        <div className="flex items-center">
+                          Date {getSortIcon('created_at')}
+                        </div>
+                      </TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredLeads.map((lead) => (
+                    {paginatedLeads.map((lead) => (
                       <TableRow key={lead.id} className="cursor-pointer hover:bg-secondary/30" onClick={() => handleViewLead(lead)}>
+                        <TableCell onClick={(e) => e.stopPropagation()}>
+                          <Checkbox
+                            checked={selectedLeadIds.has(lead.id)}
+                            onCheckedChange={(checked) => handleSelectLead(lead.id, checked as boolean)}
+                            aria-label={`Select ${lead.name || lead.email}`}
+                          />
+                        </TableCell>
                         <TableCell>
                           <div>
                             <p className="font-medium text-foreground">{lead.name || '-'}</p>
@@ -668,6 +866,65 @@ const AdminLeads = () => {
                     ))}
                   </TableBody>
                 </Table>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">Rows per page:</span>
+                      <Select value={pageSize.toString()} onValueChange={(val) => { setPageSize(Number(val)); setCurrentPage(1); }}>
+                        <SelectTrigger className="w-20 bg-secondary/50 border-border">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="10">10</SelectItem>
+                          <SelectItem value="25">25</SelectItem>
+                          <SelectItem value="50">50</SelectItem>
+                          <SelectItem value="100">100</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-muted-foreground">
+                        Page {currentPage} of {totalPages}
+                      </span>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(1)}
+                          disabled={currentPage === 1}
+                        >
+                          First
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                          disabled={currentPage === 1}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                          disabled={currentPage === totalPages}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(totalPages)}
+                          disabled={currentPage === totalPages}
+                        >
+                          Last
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
@@ -706,20 +963,25 @@ const AdminLeads = () => {
       <AlertDialog open={showBulkDeleteConfirm} onOpenChange={setShowBulkDeleteConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Bulk Delete Leads</AlertDialogTitle>
+            <AlertDialogTitle>
+              {selectedLeadIds.size > 0 ? 'Delete Selected Leads' : 'Bulk Delete Leads'}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <strong>{filteredLeads.length} leads</strong> matching your current filters? 
-              This action cannot be undone and will also delete all associated email history.
+              {selectedLeadIds.size > 0 
+                ? <>Are you sure you want to delete <strong>{selectedLeadIds.size} selected leads</strong>?</>
+                : <>Are you sure you want to delete <strong>{filteredLeads.length} leads</strong> matching your current filters?</>
+              }
+              {' '}This action cannot be undone and will also delete all associated email history.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isBulkDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleBulkDelete}
+              onClick={selectedLeadIds.size > 0 ? handleDeleteSelected : handleBulkDelete}
               disabled={isBulkDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isBulkDeleting ? "Deleting..." : `Delete ${filteredLeads.length} Leads`}
+              {isBulkDeleting ? "Deleting..." : `Delete ${selectedLeadIds.size > 0 ? selectedLeadIds.size : filteredLeads.length} Leads`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

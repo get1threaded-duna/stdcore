@@ -1,47 +1,37 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Menu, X, ExternalLink } from "lucide-react";
+import { Lock, Menu, X, ExternalLink, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 // External Utility Project URL
 const UTILITY_APP_URL = "https://id-preview--1c7bab28-ee3b-47e1-9fa7-54c85e1eddaf.lovable.app";
-const navItems = [
-  { label: "Platform", href: "#platform" },
-  { label: "Solutions", href: "#solutions" },
-  { label: "Resources", href: "#resources" },
-  { label: "Pricing", href: "#pricing" },
+
+const platformLinks = [
+  { label: "eCTD v4.0 Engine", href: "/ectd-engine", description: "Next-generation submission assembly" },
+  { label: "Legacy Bridge", href: "/legacy-bridge", description: "Seamless format conversion" },
+  { label: "ESG NextGen", href: "/esg-nextgen", description: "Modern gateway integration" },
+  { label: "Validation Suite", href: "/validation-suite", description: "Comprehensive compliance testing" },
+];
+
+const regulatoryLinks = [
+  { label: "ICH M8 Guidelines", href: "/ich-m8-guidelines", description: "International eCTD standards" },
+  { label: "FDA ESG Requirements", href: "/fda-esg-requirements", description: "Electronic submission gateway" },
+  { label: "21 CFR Part 11", href: "/21-cfr-part-11", description: "Electronic records compliance" },
+  { label: "EU CTD Standards", href: "/eu-ctd-standards", description: "European submission requirements" },
 ];
 
 const NavigationHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>("#platform");
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = navItems.map(item => ({
-        id: item.href,
-        element: document.querySelector(item.href),
-      }));
-
-      const scrollPosition = window.scrollY + 100;
-
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i];
-        if (section.element) {
-          const offsetTop = (section.element as HTMLElement).offsetTop;
-          if (scrollPosition >= offsetTop) {
-            setActiveSection(section.id);
-            break;
-          }
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <motion.header 
@@ -68,31 +58,81 @@ const NavigationHeader = () => {
           </motion.a>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navItems.map((item, index) => (
-              <motion.a
-                key={item.label}
-                href={item.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  const element = document.querySelector(item.href);
-                  element?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className={cn(
-                  "px-4 py-2 text-sm transition-colors duration-200 rounded-md relative cursor-pointer",
-                  activeSection === item.href
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                )}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index }}
-                whileHover={{ y: -1 }}
-              >
-                {item.label}
-              </motion.a>
-            ))}
-          </nav>
+          <NavigationMenu className="hidden md:flex">
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="bg-transparent text-muted-foreground hover:text-foreground hover:bg-secondary/50">
+                  Platform
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-2 p-4">
+                    {platformLinks.map((link) => (
+                      <li key={link.href}>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            to={link.href}
+                            className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">{link.label}</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                              {link.description}
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="bg-transparent text-muted-foreground hover:text-foreground hover:bg-secondary/50">
+                  Regulatory
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-2 p-4">
+                    {regulatoryLinks.map((link) => (
+                      <li key={link.href}>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            to={link.href}
+                            className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="text-sm font-medium leading-none">{link.label}</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                              {link.description}
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link
+                    to="/about"
+                    className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-md transition-colors"
+                  >
+                    About
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+
+              <NavigationMenuItem>
+                <NavigationMenuLink asChild>
+                  <Link
+                    to="/contact"
+                    className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-md transition-colors"
+                  >
+                    Contact
+                  </Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
 
           {/* Desktop CTAs */}
           <motion.div 
@@ -161,31 +201,65 @@ const NavigationHeader = () => {
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <nav className="flex flex-col gap-1 mb-4">
-                {navItems.map((item, index) => (
-                  <motion.a
-                    key={item.label}
-                    href={item.href}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const element = document.querySelector(item.href);
-                      element?.scrollIntoView({ behavior: "smooth" });
-                      setMobileMenuOpen(false);
-                    }}
-                    className={cn(
-                      "px-4 py-3 text-sm rounded-md transition-colors cursor-pointer",
-                      activeSection === item.href
-                        ? "text-primary bg-primary/10"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                    )}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.05 * index }}
+              {/* Platform Section */}
+                <div className="mb-4">
+                  <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Platform</p>
+                  {platformLinks.map((link, index) => (
+                    <motion.div
+                      key={link.href}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 * index }}
+                    >
+                      <Link
+                        to={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-4 py-3 text-sm rounded-md transition-colors text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                      >
+                        {link.label}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Regulatory Section */}
+                <div className="mb-4">
+                  <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Regulatory</p>
+                  {regulatoryLinks.map((link, index) => (
+                    <motion.div
+                      key={link.href}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 * (index + platformLinks.length) }}
+                    >
+                      <Link
+                        to={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-4 py-3 text-sm rounded-md transition-colors text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                      >
+                        {link.label}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Other Links */}
+                <div className="border-t border-border/30 pt-4">
+                  <Link
+                    to="/about"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-4 py-3 text-sm rounded-md transition-colors text-muted-foreground hover:text-foreground hover:bg-secondary/50"
                   >
-                    {item.label}
-                  </motion.a>
-                ))}
-              </nav>
+                    About
+                  </Link>
+                  <Link
+                    to="/contact"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-4 py-3 text-sm rounded-md transition-colors text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                  >
+                    Contact
+                  </Link>
+                </div>
               <div className="flex flex-col gap-2 px-4">
                 <Button variant="ghost" size="sm" className="justify-start" asChild>
                   <a href={UTILITY_APP_URL} target="_blank" rel="noopener noreferrer">

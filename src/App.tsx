@@ -19,6 +19,16 @@ import AdminAuth from "./pages/AdminAuth";
 import AdminLeads from "./pages/AdminLeads";
 import NotFound from "./pages/NotFound";
 import CookieConsent from "./components/CookieConsent";
+import EctdEngine from "./pages/EctdEngine";
+import LegacyBridge from "./pages/LegacyBridge";
+import EsgNextgen from "./pages/EsgNextgen";
+import ValidationSuite from "./pages/ValidationSuite";
+import IchM8Guidelines from "./pages/IchM8Guidelines";
+import FdaEsgRequirements from "./pages/FdaEsgRequirements";
+import CfrPart11 from "./pages/CfrPart11";
+import EuCtdStandards from "./pages/EuCtdStandards";
+import AboutUs from "./pages/AboutUs";
+import Careers from "./pages/Careers";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +53,16 @@ const App = () => (
           <Route path="/readiness-calculator" element={<ReadinessCalculator />} />
           <Route path="/admin" element={<AdminAuth />} />
           <Route path="/admin/leads" element={<AdminLeads />} />
+          <Route path="/ectd-engine" element={<EctdEngine />} />
+          <Route path="/legacy-bridge" element={<LegacyBridge />} />
+          <Route path="/esg-nextgen" element={<EsgNextgen />} />
+          <Route path="/validation-suite" element={<ValidationSuite />} />
+          <Route path="/ich-m8-guidelines" element={<IchM8Guidelines />} />
+          <Route path="/fda-esg-requirements" element={<FdaEsgRequirements />} />
+          <Route path="/21-cfr-part-11" element={<CfrPart11 />} />
+          <Route path="/eu-ctd-standards" element={<EuCtdStandards />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/careers" element={<Careers />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

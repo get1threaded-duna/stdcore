@@ -12,10 +12,10 @@ type FooterLink = {
 
 const footerLinks: Record<string, FooterLink[]> = {
   platform: [
-    { label: "eCTD v4.0 Engine", href: "#", disabled: true },
-    { label: "Legacy Bridge", href: "#", disabled: true },
-    { label: "ESG NextGen", href: "#", disabled: true },
-    { label: "Validation Suite", href: "#", disabled: true },
+    { label: "eCTD v4.0 Engine", href: "/ectd-engine", isRoute: true },
+    { label: "Legacy Bridge", href: "/legacy-bridge", isRoute: true },
+    { label: "ESG NextGen", href: "/esg-nextgen", isRoute: true },
+    { label: "Validation Suite", href: "/validation-suite", isRoute: true },
   ],
   resources: [
     { label: "Readiness Calculator", href: "/readiness-calculator", isRoute: true },
@@ -24,14 +24,14 @@ const footerLinks: Record<string, FooterLink[]> = {
     { label: "Blog", href: "/blog", isRoute: true },
   ],
   regulatory: [
-    { label: "ICH M8 Guidelines", href: "#", disabled: true },
-    { label: "FDA ESG Requirements", href: "#", disabled: true },
-    { label: "21 CFR Part 11", href: "#", disabled: true },
-    { label: "EU CTD Standards", href: "#", disabled: true },
+    { label: "ICH M8 Guidelines", href: "/ich-m8-guidelines", isRoute: true },
+    { label: "FDA ESG Requirements", href: "/fda-esg-requirements", isRoute: true },
+    { label: "21 CFR Part 11", href: "/21-cfr-part-11", isRoute: true },
+    { label: "EU CTD Standards", href: "/eu-ctd-standards", isRoute: true },
   ],
   company: [
-    { label: "About Us", href: "#", disabled: true },
-    { label: "Careers", href: "#", disabled: true },
+    { label: "About Us", href: "/about", isRoute: true },
+    { label: "Careers", href: "/careers", isRoute: true },
     { label: "Contact", href: "/contact", isRoute: true },
     { label: "Press Kit", href: "#", disabled: true },
   ],

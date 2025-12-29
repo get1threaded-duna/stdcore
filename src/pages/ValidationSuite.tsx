@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import NavigationHeader from "@/components/NavigationHeader";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import { CheckSquare, CheckCircle, ArrowRight, AlertTriangle, FileSearch, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -178,6 +179,7 @@ const ValidationSuite = () => {
       </main>
 
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

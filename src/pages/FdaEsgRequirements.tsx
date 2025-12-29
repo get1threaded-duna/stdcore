@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import NavigationHeader from "@/components/NavigationHeader";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import { Send, CheckCircle, AlertTriangle, FileText, Shield, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -203,6 +204,7 @@ const FdaEsgRequirements = () => {
       </main>
 
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

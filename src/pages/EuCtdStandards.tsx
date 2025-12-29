@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import NavigationHeader from "@/components/NavigationHeader";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import { Globe, CheckCircle, FileText, Building, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -190,6 +191,7 @@ const EuCtdStandards = () => {
       </main>
 
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

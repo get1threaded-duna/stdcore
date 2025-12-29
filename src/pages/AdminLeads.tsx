@@ -12,9 +12,10 @@ import LeadDetailModal from "@/components/LeadDetailModal";
 import { 
   LogOut, Download, Search, Filter, Mail, Calendar,
   Building, TrendingUp, Users, DollarSign, RefreshCw, Eye, Send, Trash2,
-  ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight
+  ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, BarChart3
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import LeadAnalytics from "@/components/LeadAnalytics";
 import {
   Select,
   SelectContent,
@@ -89,6 +90,7 @@ const AdminLeads = () => {
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const [showAnalytics, setShowAnalytics] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -435,10 +437,14 @@ const AdminLeads = () => {
   };
 
   const handleBatchEmail = async () => {
-    if (filteredLeads.length === 0) {
+    const targetLeads = selectedLeadIds.size > 0 
+      ? leads.filter(l => selectedLeadIds.has(l.id))
+      : filteredLeads;
+
+    if (targetLeads.length === 0) {
       toast({
         title: "No Leads",
-        description: "No leads to email with current filters",
+        description: selectedLeadIds.size > 0 ? "No leads selected" : "No leads to email with current filters",
         variant: "destructive",
       });
       return;
@@ -446,7 +452,7 @@ const AdminLeads = () => {
 
     setSendingBatch(true);
     try {
-      const leadIds = filteredLeads.map(lead => lead.id);
+      const leadIds = targetLeads.map(lead => lead.id);
       
       const { data, error } = await supabase.functions.invoke('send-lead-email', {
         body: { leadIds }
@@ -458,6 +464,10 @@ const AdminLeads = () => {
         title: "Batch Email Complete",
         description: `Sent ${data.sent} emails successfully${data.failed > 0 ? `, ${data.failed} failed` : ''}`,
       });
+      
+      if (selectedLeadIds.size > 0) {
+        setSelectedLeadIds(new Set());
+      }
     } catch (error: any) {
       toast({
         title: "Batch Email Failed",
@@ -571,6 +581,9 @@ const AdminLeads = () => {
           </Card>
         </div>
 
+        {/* Analytics Section */}
+        {showAnalytics && <LeadAnalytics leads={filteredLeads} />}
+
         {/* Filters */}
         <Card className="mb-6 bg-card/50 border-border/50">
           <CardHeader>
@@ -679,14 +692,28 @@ const AdminLeads = () => {
               </CardDescription>
             </div>
             <div className="flex gap-2 flex-wrap">
+              <Button 
+                variant={showAnalytics ? "default" : "outline"} 
+                onClick={() => setShowAnalytics(!showAnalytics)}
+              >
+                <BarChart3 className="mr-2 h-4 w-4" />
+                {showAnalytics ? "Hide" : "Show"} Analytics
+              </Button>
               <Button variant="outline" onClick={fetchLeads} disabled={isLoading}>
                 <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
-              <Button variant="outline" onClick={handleBatchEmail} disabled={sendingBatch || filteredLeads.length === 0}>
-                <Send className={`mr-2 h-4 w-4 ${sendingBatch ? 'animate-pulse' : ''}`} />
-                Email All ({filteredLeads.length})
-              </Button>
+              {selectedLeadIds.size > 0 ? (
+                <Button variant="outline" onClick={handleBatchEmail} disabled={sendingBatch}>
+                  <Send className={`mr-2 h-4 w-4 ${sendingBatch ? 'animate-pulse' : ''}`} />
+                  Email Selected ({selectedLeadIds.size})
+                </Button>
+              ) : (
+                <Button variant="outline" onClick={handleBatchEmail} disabled={sendingBatch || filteredLeads.length === 0}>
+                  <Send className={`mr-2 h-4 w-4 ${sendingBatch ? 'animate-pulse' : ''}`} />
+                  Email All ({filteredLeads.length})
+                </Button>
+              )}
               <Button onClick={handleExportCSV}>
                 <Download className="mr-2 h-4 w-4" />
                 Export CSV

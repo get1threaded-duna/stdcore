@@ -68,6 +68,44 @@ export type Database = {
         }
         Relationships: []
       }
+      email_history: {
+        Row: {
+          email_type: string
+          id: string
+          lead_id: string
+          sent_at: string
+          sent_by: string | null
+          status: string
+          subject: string
+        }
+        Insert: {
+          email_type?: string
+          id?: string
+          lead_id: string
+          sent_at?: string
+          sent_by?: string | null
+          status?: string
+          subject: string
+        }
+        Update: {
+          email_type?: string
+          id?: string
+          lead_id?: string
+          sent_at?: string
+          sent_by?: string | null
+          status?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_history_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "calculator_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string

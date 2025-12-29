@@ -135,8 +135,35 @@ const generateEmailHtml = (lead: Lead): string => {
   `;
 };
 
+const sendEmailToLead = async (supabase: any, lead: Lead): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const subject = `Your eCTD v4.0 Readiness Score: ${lead.velocity_score}/100 (Grade ${lead.velocity_grade})`;
+    
+    const emailResponse = await resend.emails.send({
+      from: "eCTD Readiness <onboarding@resend.dev>",
+      to: [lead.email],
+      subject,
+      html: generateEmailHtml(lead),
+    });
+
+    console.log(`Email sent to ${lead.email}:`, emailResponse);
+
+    // Log email in history
+    await supabase.from("email_history").insert({
+      lead_id: lead.id,
+      subject,
+      status: "sent",
+      email_type: "results_summary",
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    console.error(`Failed to send email to ${lead.email}:`, error);
+    return { success: false, error: error.message };
+  }
+};
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -146,15 +173,52 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { leadId } = await req.json();
+    const { leadId, leadIds } = await req.json();
 
+    // Batch sending
+    if (leadIds && Array.isArray(leadIds) && leadIds.length > 0) {
+      console.log(`Batch sending emails to ${leadIds.length} leads`);
+
+      const { data: leads, error: fetchError } = await supabase
+        .from("calculator_leads")
+        .select("*")
+        .in("id", leadIds);
+
+      if (fetchError || !leads) {
+        console.error("Error fetching leads:", fetchError);
+        throw new Error("Failed to fetch leads");
+      }
+
+      const results = await Promise.all(
+        leads.map((lead: Lead) => sendEmailToLead(supabase, lead))
+      );
+
+      const successful = results.filter((r) => r.success).length;
+      const failed = results.filter((r) => !r.success).length;
+
+      console.log(`Batch complete: ${successful} sent, ${failed} failed`);
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          sent: successful,
+          failed,
+          total: leads.length,
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    // Single email sending
     if (!leadId) {
-      throw new Error("Lead ID is required");
+      throw new Error("Lead ID or Lead IDs array is required");
     }
 
     console.log(`Fetching lead with ID: ${leadId}`);
 
-    // Fetch lead data
     const { data: lead, error: fetchError } = await supabase
       .from("calculator_leads")
       .select("*")
@@ -166,20 +230,14 @@ serve(async (req) => {
       throw new Error("Lead not found");
     }
 
-    console.log(`Sending email to: ${lead.email}`);
+    const result = await sendEmailToLead(supabase, lead);
 
-    // Send email via Resend
-    const emailResponse = await resend.emails.send({
-      from: "eCTD Readiness <onboarding@resend.dev>",
-      to: [lead.email],
-      subject: `Your eCTD v4.0 Readiness Score: ${lead.velocity_score}/100 (Grade ${lead.velocity_grade})`,
-      html: generateEmailHtml(lead),
-    });
-
-    console.log("Email sent successfully:", emailResponse);
+    if (!result.success) {
+      throw new Error(result.error || "Failed to send email");
+    }
 
     return new Response(
-      JSON.stringify({ success: true, response: emailResponse }),
+      JSON.stringify({ success: true }),
       {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },

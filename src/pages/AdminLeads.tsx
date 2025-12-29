@@ -8,11 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import LeadDetailModal from "@/components/LeadDetailModal";
 import { 
   LogOut, Download, Search, Filter, Mail, Calendar,
-  Building, TrendingUp, Users, DollarSign, RefreshCw
+  Building, TrendingUp, Users, DollarSign, RefreshCw, Eye, Send
 } from "lucide-react";
-import { Session, User } from "@supabase/supabase-js";
+import { Session } from "@supabase/supabase-js";
 import { format, parseISO } from "date-fns";
 
 interface Lead {
@@ -33,6 +34,14 @@ interface Lead {
   created_at: string;
 }
 
+interface EmailRecord {
+  id: string;
+  sent_at: string;
+  subject: string;
+  status: string;
+  email_type: string;
+}
+
 const AdminLeads = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,6 +52,10 @@ const AdminLeads = () => {
   const [minScore, setMinScore] = useState("");
   const [maxScore, setMaxScore] = useState("");
   const [sendingEmail, setSendingEmail] = useState<string | null>(null);
+  const [sendingBatch, setSendingBatch] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [emailHistory, setEmailHistory] = useState<EmailRecord[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -89,21 +102,46 @@ const AdminLeads = () => {
     }
   };
 
+  const fetchEmailHistory = async (leadId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('email_history')
+        .select('*')
+        .eq('lead_id', leadId)
+        .order('sent_at', { ascending: false });
+
+      if (error) throw error;
+      setEmailHistory(data || []);
+    } catch (error: any) {
+      console.error('Failed to fetch email history:', error);
+      setEmailHistory([]);
+    }
+  };
+
+  const handleViewLead = async (lead: Lead) => {
+    setSelectedLead(lead);
+    await fetchEmailHistory(lead.id);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedLead(null);
+    setEmailHistory([]);
+  };
+
   const filteredLeads = useMemo(() => {
     return leads.filter(lead => {
-      // Search filter
       const searchLower = searchTerm.toLowerCase();
       const matchesSearch = !searchTerm || 
         lead.email.toLowerCase().includes(searchLower) ||
         (lead.name?.toLowerCase().includes(searchLower)) ||
         (lead.company?.toLowerCase().includes(searchLower));
 
-      // Date filter
       const leadDate = parseISO(lead.created_at);
       const matchesDateFrom = !dateFrom || leadDate >= parseISO(dateFrom);
       const matchesDateTo = !dateTo || leadDate <= parseISO(dateTo + 'T23:59:59');
 
-      // Score filter
       const score = lead.velocity_score || 0;
       const matchesMinScore = !minScore || score >= parseInt(minScore);
       const matchesMaxScore = !maxScore || score <= parseInt(maxScore);
@@ -182,6 +220,41 @@ const AdminLeads = () => {
     }
   };
 
+  const handleBatchEmail = async () => {
+    if (filteredLeads.length === 0) {
+      toast({
+        title: "No Leads",
+        description: "No leads to email with current filters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSendingBatch(true);
+    try {
+      const leadIds = filteredLeads.map(lead => lead.id);
+      
+      const { data, error } = await supabase.functions.invoke('send-lead-email', {
+        body: { leadIds }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Batch Email Complete",
+        description: `Sent ${data.sent} emails successfully${data.failed > 0 ? `, ${data.failed} failed` : ''}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Batch Email Failed",
+        description: error.message || "Failed to send batch emails",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingBatch(false);
+    }
+  };
+
   const getGradeBadgeVariant = (grade: string | null) => {
     switch (grade) {
       case 'A': return 'default';
@@ -203,7 +276,6 @@ const AdminLeads = () => {
     }).format(value);
   };
 
-  // Summary stats
   const stats = useMemo(() => ({
     totalLeads: filteredLeads.length,
     avgScore: filteredLeads.length > 0 
@@ -215,7 +287,6 @@ const AdminLeads = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div>
@@ -274,8 +345,8 @@ const AdminLeads = () => {
           <Card className="bg-card/50 border-border/50">
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="p-2 rounded-lg bg-success/10">
-                  <Building className="h-5 w-5 text-success" />
+                <div className="p-2 rounded-lg bg-green-500/10">
+                  <Building className="h-5 w-5 text-green-500" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-foreground">{stats.uniqueCompanies}</p>
@@ -359,10 +430,14 @@ const AdminLeads = () => {
               <CardTitle className="text-lg">Leads</CardTitle>
               <CardDescription>{filteredLeads.length} results</CardDescription>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Button variant="outline" onClick={fetchLeads} disabled={isLoading}>
                 <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                 Refresh
+              </Button>
+              <Button variant="outline" onClick={handleBatchEmail} disabled={sendingBatch || filteredLeads.length === 0}>
+                <Send className={`mr-2 h-4 w-4 ${sendingBatch ? 'animate-pulse' : ''}`} />
+                Email All ({filteredLeads.length})
               </Button>
               <Button onClick={handleExportCSV}>
                 <Download className="mr-2 h-4 w-4" />
@@ -395,7 +470,7 @@ const AdminLeads = () => {
                   </TableHeader>
                   <TableBody>
                     {filteredLeads.map((lead) => (
-                      <TableRow key={lead.id}>
+                      <TableRow key={lead.id} className="cursor-pointer hover:bg-secondary/30" onClick={() => handleViewLead(lead)}>
                         <TableCell>
                           <div>
                             <p className="font-medium text-foreground">{lead.name || '-'}</p>
@@ -430,14 +505,29 @@ const AdminLeads = () => {
                           {format(parseISO(lead.created_at), 'MMM d, yyyy')}
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleSendEmail(lead)}
-                            disabled={sendingEmail === lead.id}
-                          >
-                            <Mail className={`h-4 w-4 ${sendingEmail === lead.id ? 'animate-pulse' : ''}`} />
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewLead(lead);
+                              }}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSendEmail(lead);
+                              }}
+                              disabled={sendingEmail === lead.id}
+                            >
+                              <Mail className={`h-4 w-4 ${sendingEmail === lead.id ? 'animate-pulse' : ''}`} />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -448,6 +538,13 @@ const AdminLeads = () => {
           </CardContent>
         </Card>
       </main>
+
+      <LeadDetailModal
+        lead={selectedLead}
+        emailHistory={emailHistory}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };

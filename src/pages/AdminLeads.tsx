@@ -74,8 +74,11 @@ const AdminLeads = () => {
   const [emailHistory, setEmailHistory] = useState<EmailRecord[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [velocityGradeFilter, setVelocityGradeFilter] = useState("all");
+  const [dataArchitectureFilter, setDataArchitectureFilter] = useState("all");
   const [deletingLead, setDeletingLead] = useState<Lead | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -167,10 +170,11 @@ const AdminLeads = () => {
       const matchesMaxScore = !maxScore || score <= parseInt(maxScore);
 
       const matchesGrade = velocityGradeFilter === "all" || lead.velocity_grade === velocityGradeFilter;
+      const matchesArchitecture = dataArchitectureFilter === "all" || lead.data_architecture === dataArchitectureFilter;
 
-      return matchesSearch && matchesDateFrom && matchesDateTo && matchesMinScore && matchesMaxScore && matchesGrade;
+      return matchesSearch && matchesDateFrom && matchesDateTo && matchesMinScore && matchesMaxScore && matchesGrade && matchesArchitecture;
     });
-  }, [leads, searchTerm, dateFrom, dateTo, minScore, maxScore, velocityGradeFilter]);
+  }, [leads, searchTerm, dateFrom, dateTo, minScore, maxScore, velocityGradeFilter, dataArchitectureFilter]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -203,6 +207,37 @@ const AdminLeads = () => {
     } finally {
       setIsDeleting(false);
       setDeletingLead(null);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (filteredLeads.length === 0) return;
+    
+    setIsBulkDeleting(true);
+    try {
+      const leadIds = filteredLeads.map(lead => lead.id);
+      
+      const { error } = await supabase
+        .from('calculator_leads')
+        .delete()
+        .in('id', leadIds);
+
+      if (error) throw error;
+
+      setLeads(leads.filter(l => !leadIds.includes(l.id)));
+      toast({
+        title: "Bulk Delete Complete",
+        description: `Successfully deleted ${leadIds.length} leads`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Bulk Delete Failed",
+        description: error.message || "Failed to delete leads",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBulkDeleting(false);
+      setShowBulkDeleteConfirm(false);
     }
   };
 
@@ -417,7 +452,7 @@ const AdminLeads = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
               <div className="lg:col-span-2">
                 <Label className="text-foreground">Search</Label>
                 <div className="relative">
@@ -443,6 +478,20 @@ const AdminLeads = () => {
                     <SelectItem value="C">Grade C</SelectItem>
                     <SelectItem value="D">Grade D</SelectItem>
                     <SelectItem value="F">Grade F</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-foreground">Architecture</Label>
+                <Select value={dataArchitectureFilter} onValueChange={setDataArchitectureFilter}>
+                  <SelectTrigger className="bg-secondary/50 border-border">
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="centralized">Centralized</SelectItem>
+                    <SelectItem value="decentralized">Decentralized</SelectItem>
+                    <SelectItem value="hybrid">Hybrid</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -509,6 +558,14 @@ const AdminLeads = () => {
               <Button onClick={handleExportCSV}>
                 <Download className="mr-2 h-4 w-4" />
                 Export CSV
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={() => setShowBulkDeleteConfirm(true)} 
+                disabled={filteredLeads.length === 0}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete All ({filteredLeads.length})
               </Button>
             </div>
           </CardHeader>
@@ -641,6 +698,28 @@ const AdminLeads = () => {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showBulkDeleteConfirm} onOpenChange={setShowBulkDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bulk Delete Leads</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete <strong>{filteredLeads.length} leads</strong> matching your current filters? 
+              This action cannot be undone and will also delete all associated email history.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+              disabled={isBulkDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isBulkDeleting ? "Deleting..." : `Delete ${filteredLeads.length} Leads`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

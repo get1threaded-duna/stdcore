@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import NavigationHeader from "@/components/NavigationHeader";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import { BookOpen, FileText, Globe, Calendar, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -185,6 +186,7 @@ const IchM8Guidelines = () => {
       </main>
 
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

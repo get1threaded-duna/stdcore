@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import NavigationHeader from "@/components/NavigationHeader";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import { Shield, CheckCircle, Lock, FileText, Users, Clock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -213,6 +214,7 @@ const CfrPart11 = () => {
       </main>
 
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

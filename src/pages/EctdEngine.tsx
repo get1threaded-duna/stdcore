@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import NavigationHeader from "@/components/NavigationHeader";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import { Zap, CheckCircle, ArrowRight, FileText, Settings, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -145,6 +146,7 @@ const EctdEngine = () => {
       </main>
 
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

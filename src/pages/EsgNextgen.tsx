@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import NavigationHeader from "@/components/NavigationHeader";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import { Send, CheckCircle, ArrowRight, Shield, Clock, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -176,6 +177,7 @@ const EsgNextgen = () => {
       </main>
 
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };

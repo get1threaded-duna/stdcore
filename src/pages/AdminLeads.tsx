@@ -11,8 +11,25 @@ import { useToast } from "@/hooks/use-toast";
 import LeadDetailModal from "@/components/LeadDetailModal";
 import { 
   LogOut, Download, Search, Filter, Mail, Calendar,
-  Building, TrendingUp, Users, DollarSign, RefreshCw, Eye, Send
+  Building, TrendingUp, Users, DollarSign, RefreshCw, Eye, Send, Trash2
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Session } from "@supabase/supabase-js";
 import { format, parseISO } from "date-fns";
 
@@ -56,6 +73,9 @@ const AdminLeads = () => {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [emailHistory, setEmailHistory] = useState<EmailRecord[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [velocityGradeFilter, setVelocityGradeFilter] = useState("all");
+  const [deletingLead, setDeletingLead] = useState<Lead | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -146,13 +166,44 @@ const AdminLeads = () => {
       const matchesMinScore = !minScore || score >= parseInt(minScore);
       const matchesMaxScore = !maxScore || score <= parseInt(maxScore);
 
-      return matchesSearch && matchesDateFrom && matchesDateTo && matchesMinScore && matchesMaxScore;
+      const matchesGrade = velocityGradeFilter === "all" || lead.velocity_grade === velocityGradeFilter;
+
+      return matchesSearch && matchesDateFrom && matchesDateTo && matchesMinScore && matchesMaxScore && matchesGrade;
     });
-  }, [leads, searchTerm, dateFrom, dateTo, minScore, maxScore]);
+  }, [leads, searchTerm, dateFrom, dateTo, minScore, maxScore, velocityGradeFilter]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/admin');
+  };
+
+  const handleDeleteLead = async () => {
+    if (!deletingLead) return;
+    
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('calculator_leads')
+        .delete()
+        .eq('id', deletingLead.id);
+
+      if (error) throw error;
+
+      setLeads(leads.filter(l => l.id !== deletingLead.id));
+      toast({
+        title: "Lead Deleted",
+        description: `Successfully deleted lead for ${deletingLead.email}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete lead",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setDeletingLead(null);
+    }
   };
 
   const handleExportCSV = () => {
@@ -366,7 +417,7 @@ const AdminLeads = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
               <div className="lg:col-span-2">
                 <Label className="text-foreground">Search</Label>
                 <div className="relative">
@@ -378,6 +429,22 @@ const AdminLeads = () => {
                     className="pl-10 bg-secondary/50 border-border"
                   />
                 </div>
+              </div>
+              <div>
+                <Label className="text-foreground">Grade</Label>
+                <Select value={velocityGradeFilter} onValueChange={setVelocityGradeFilter}>
+                  <SelectTrigger className="bg-secondary/50 border-border">
+                    <SelectValue placeholder="All Grades" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Grades</SelectItem>
+                    <SelectItem value="A">Grade A</SelectItem>
+                    <SelectItem value="B">Grade B</SelectItem>
+                    <SelectItem value="C">Grade C</SelectItem>
+                    <SelectItem value="D">Grade D</SelectItem>
+                    <SelectItem value="F">Grade F</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label className="text-foreground">From Date</Label>
@@ -527,6 +594,17 @@ const AdminLeads = () => {
                             >
                               <Mail className={`h-4 w-4 ${sendingEmail === lead.id ? 'animate-pulse' : ''}`} />
                             </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeletingLead(lead);
+                              }}
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -545,6 +623,28 @@ const AdminLeads = () => {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
+
+      <AlertDialog open={!!deletingLead} onOpenChange={(open) => !open && setDeletingLead(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Lead</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the lead for <strong>{deletingLead?.email}</strong>? 
+              This action cannot be undone and will also delete all associated email history.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteLead}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

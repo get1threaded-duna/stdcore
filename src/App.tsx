@@ -15,6 +15,8 @@ import Whitepaper from "./pages/Whitepaper";
 import Blog from "./pages/Blog";
 import BlogPostDeterministic from "./pages/BlogPostDeterministic";
 import ReadinessCalculator from "./pages/ReadinessCalculator";
+import AdminAuth from "./pages/AdminAuth";
+import AdminLeads from "./pages/AdminLeads";
 import NotFound from "./pages/NotFound";
 import CookieConsent from "./components/CookieConsent";
 
@@ -39,6 +41,8 @@ const App = () => (
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/deterministic-vs-probabilistic-regulatory" element={<BlogPostDeterministic />} />
           <Route path="/readiness-calculator" element={<ReadinessCalculator />} />
+          <Route path="/admin" element={<AdminAuth />} />
+          <Route path="/admin/leads" element={<AdminLeads />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

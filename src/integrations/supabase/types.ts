@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      calculator_leads: {
+        Row: {
+          active_applications: number | null
+          annual_submissions: number | null
+          company: string | null
+          created_at: string
+          data_architecture: string | null
+          email: string
+          financial_risk: number | null
+          has_validated_system: boolean | null
+          id: string
+          job_title: string | null
+          name: string | null
+          rtf_probability: number | null
+          team_size: number | null
+          velocity_grade: string | null
+          velocity_score: number | null
+        }
+        Insert: {
+          active_applications?: number | null
+          annual_submissions?: number | null
+          company?: string | null
+          created_at?: string
+          data_architecture?: string | null
+          email: string
+          financial_risk?: number | null
+          has_validated_system?: boolean | null
+          id?: string
+          job_title?: string | null
+          name?: string | null
+          rtf_probability?: number | null
+          team_size?: number | null
+          velocity_grade?: string | null
+          velocity_score?: number | null
+        }
+        Update: {
+          active_applications?: number | null
+          annual_submissions?: number | null
+          company?: string | null
+          created_at?: string
+          data_architecture?: string | null
+          email?: string
+          financial_risk?: number | null
+          has_validated_system?: boolean | null
+          id?: string
+          job_title?: string | null
+          name?: string | null
+          rtf_probability?: number | null
+          team_size?: number | null
+          velocity_grade?: string | null
+          velocity_score?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

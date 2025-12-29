@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
-import { Calculator, AlertTriangle, CheckCircle2, TrendingUp, DollarSign, Clock, Users, FileStack, Database, Copy, Check, ArrowRight, Download } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Calculator, AlertTriangle, CheckCircle2, TrendingUp, DollarSign, Clock, Users, FileStack, Database, Copy, Check, ArrowRight, Download, Lock, Mail, Building, Briefcase } from "lucide-react";
 import NavigationHeader from "@/components/NavigationHeader";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -11,6 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 type DataArchitecture = "legacy-xml" | "hybrid" | "relational";
 
@@ -31,8 +32,25 @@ interface CalculatorResults {
   recommendations: string[];
 }
 
+interface LeadFormData {
+  email: string;
+  name: string;
+  company: string;
+  jobTitle: string;
+}
+
 const ReadinessCalculator = () => {
   const [copied, setCopied] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [showLeadGate, setShowLeadGate] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [leadForm, setLeadForm] = useState<LeadFormData>({
+    email: "",
+    name: "",
+    company: "",
+    jobTitle: ""
+  });
+  
   const [inputs, setInputs] = useState<CalculatorInputs>({
     activeApplications: 5,
     teamSize: 10,
@@ -143,6 +161,72 @@ const ReadinessCalculator = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleUnlockResults = () => {
+    setShowLeadGate(true);
+  };
+
+  const handleLeadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!leadForm.email.trim()) {
+      toast({
+        title: "Email required",
+        description: "Please enter your business email to access the full report.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Simple email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(leadForm.email)) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase.from('calculator_leads').insert({
+        email: leadForm.email.trim(),
+        name: leadForm.name.trim() || null,
+        company: leadForm.company.trim() || null,
+        job_title: leadForm.jobTitle.trim() || null,
+        active_applications: inputs.activeApplications,
+        team_size: inputs.teamSize,
+        data_architecture: inputs.dataArchitecture,
+        annual_submissions: inputs.annualSubmissions,
+        has_validated_system: inputs.hasValidatedSystem,
+        velocity_score: results.velocityScore,
+        velocity_grade: results.velocityGrade,
+        financial_risk: results.financialRisk,
+        rtf_probability: results.rtfProbability
+      });
+
+      if (error) throw error;
+
+      setIsUnlocked(true);
+      setShowLeadGate(false);
+      toast({
+        title: "Report unlocked",
+        description: "You now have full access to your compliance velocity analysis."
+      });
+    } catch (error) {
+      console.error("Lead submission error:", error);
+      toast({
+        title: "Submission error",
+        description: "Unable to process your request. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-success";
     if (score >= 65) return "text-primary";
@@ -172,6 +256,117 @@ const ReadinessCalculator = () => {
     <div className="min-h-screen bg-background">
       <NavigationHeader />
       <ScrollToTop />
+      
+      {/* Lead Capture Modal */}
+      <AnimatePresence>
+        {showLeadGate && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
+            onClick={() => setShowLeadGate(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md bg-card border border-border rounded-2xl p-6 md:p-8 shadow-2xl"
+            >
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Lock className="w-8 h-8 text-primary" />
+                </div>
+                <h2 className="text-2xl font-bold text-foreground mb-2">Unlock Your Full Report</h2>
+                <p className="text-muted-foreground text-sm">
+                  Enter your business email to access detailed financial risk analysis, 
+                  priority recommendations, and downloadable PDF report.
+                </p>
+              </div>
+
+              <form onSubmit={handleLeadSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-muted-foreground" />
+                    Business Email <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@company.com"
+                    value={leadForm.email}
+                    onChange={(e) => setLeadForm(prev => ({ ...prev, email: e.target.value }))}
+                    required
+                    className="bg-background"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-muted-foreground" />
+                    Full Name
+                  </Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Jane Smith"
+                    value={leadForm.name}
+                    onChange={(e) => setLeadForm(prev => ({ ...prev, name: e.target.value }))}
+                    className="bg-background"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="company" className="flex items-center gap-2">
+                    <Building className="w-4 h-4 text-muted-foreground" />
+                    Company
+                  </Label>
+                  <Input
+                    id="company"
+                    type="text"
+                    placeholder="Acme Pharmaceuticals"
+                    value={leadForm.company}
+                    onChange={(e) => setLeadForm(prev => ({ ...prev, company: e.target.value }))}
+                    className="bg-background"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="jobTitle" className="flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 text-muted-foreground" />
+                    Job Title
+                  </Label>
+                  <Input
+                    id="jobTitle"
+                    type="text"
+                    placeholder="VP Regulatory Affairs"
+                    value={leadForm.jobTitle}
+                    onChange={(e) => setLeadForm(prev => ({ ...prev, jobTitle: e.target.value }))}
+                    className="bg-background"
+                  />
+                </div>
+
+                <Button type="submit" className="w-full gap-2" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>Processing...</>
+                  ) : (
+                    <>
+                      Unlock Full Report
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </Button>
+
+                <p className="text-xs text-muted-foreground text-center">
+                  By submitting, you agree to receive communications from StandardCore. 
+                  Your data is protected under our Privacy Policy.
+                </p>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       <main className="pt-24 pb-20">
         <div className="container mx-auto px-6">
@@ -351,7 +546,7 @@ const ReadinessCalculator = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="space-y-6"
             >
-              {/* Velocity Score Card */}
+              {/* Velocity Score Card - Always Visible */}
               <div className="bg-card/50 border border-border/50 rounded-2xl p-6 md:p-8">
                 <div className="flex items-start justify-between mb-6">
                   <div>
@@ -388,58 +583,100 @@ const ReadinessCalculator = () => {
                 </div>
               </div>
 
-              {/* Financial Risk Card */}
-              <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-6 md:p-8">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-destructive/20 flex items-center justify-center flex-shrink-0">
-                    <DollarSign className="w-6 h-6 text-destructive" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-foreground mb-1">Estimated Annual Financial Risk</h3>
-                    <p className="text-sm text-muted-foreground mb-4">Based on $1M/day filing delay industry benchmark</p>
+              {/* Gated Content */}
+              {!isUnlocked ? (
+                /* Lead Gate CTA */
+                <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-primary/20 rounded-2xl p-6 md:p-8">
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                      <Lock className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">Unlock Your Complete Analysis</h3>
+                    <p className="text-muted-foreground text-sm mb-6 max-w-sm mx-auto">
+                      Get detailed financial risk projections, priority recommendations, 
+                      and a downloadable executive summary.
+                    </p>
                     
-                    <div className="text-4xl font-bold text-destructive mb-4">
-                      {formatCurrency(results.financialRisk)}
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div className="bg-background/50 rounded-lg p-3 border border-border/50">
+                        <DollarSign className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
+                        <div className="text-xs text-muted-foreground">Financial Risk</div>
+                        <div className="text-lg font-bold text-foreground blur-sm select-none">$XX.XM</div>
+                      </div>
+                      <div className="bg-background/50 rounded-lg p-3 border border-border/50">
+                        <AlertTriangle className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
+                        <div className="text-xs text-muted-foreground">RTF Probability</div>
+                        <div className="text-lg font-bold text-foreground blur-sm select-none">XX%</div>
+                      </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="bg-background/50 rounded-lg p-3">
-                        <div className="text-muted-foreground mb-1">RTF Probability</div>
-                        <div className="text-xl font-bold text-foreground">{(results.rtfProbability * 100).toFixed(0)}%</div>
-                      </div>
-                      <div className="bg-background/50 rounded-lg p-3">
-                        <div className="text-muted-foreground mb-1">Est. Delay Days/Year</div>
-                        <div className="text-xl font-bold text-foreground">{results.estimatedDelayDays}</div>
-                      </div>
-                    </div>
+                    <Button onClick={handleUnlockResults} size="lg" className="w-full gap-2">
+                      <Mail className="w-4 h-4" />
+                      Get Full Report (Free)
+                    </Button>
+                    
+                    <p className="text-xs text-muted-foreground mt-4">
+                      No credit card required. Instant access.
+                    </p>
                   </div>
                 </div>
-              </div>
+              ) : (
+                /* Unlocked Content */
+                <>
+                  {/* Financial Risk Card */}
+                  <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-6 md:p-8">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-destructive/20 flex items-center justify-center flex-shrink-0">
+                        <DollarSign className="w-6 h-6 text-destructive" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-foreground mb-1">Estimated Annual Financial Risk</h3>
+                        <p className="text-sm text-muted-foreground mb-4">Based on $1M/day filing delay industry benchmark</p>
+                        
+                        <div className="text-4xl font-bold text-destructive mb-4">
+                          {formatCurrency(results.financialRisk)}
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="bg-background/50 rounded-lg p-3">
+                            <div className="text-muted-foreground mb-1">RTF Probability</div>
+                            <div className="text-xl font-bold text-foreground">{(results.rtfProbability * 100).toFixed(0)}%</div>
+                          </div>
+                          <div className="bg-background/50 rounded-lg p-3">
+                            <div className="text-muted-foreground mb-1">Est. Delay Days/Year</div>
+                            <div className="text-xl font-bold text-foreground">{results.estimatedDelayDays}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-              {/* Recommendations */}
-              <div className="bg-card/50 border border-border/50 rounded-2xl p-6 md:p-8">
-                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-warning" />
-                  Priority Recommendations
-                </h3>
-                <ul className="space-y-3">
-                  {results.recommendations.map((rec, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-xs font-bold text-primary">{index + 1}</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{rec}</p>
-                    </li>
-                  ))}
-                </ul>
-                
-                <div className="mt-6 pt-6 border-t border-border/50">
-                  <Button className="w-full gap-2">
-                    Schedule Readiness Assessment
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
+                  {/* Recommendations */}
+                  <div className="bg-card/50 border border-border/50 rounded-2xl p-6 md:p-8">
+                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-warning" />
+                      Priority Recommendations
+                    </h3>
+                    <ul className="space-y-3">
+                      {results.recommendations.map((rec, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-xs font-bold text-primary">{index + 1}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{rec}</p>
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <div className="mt-6 pt-6 border-t border-border/50">
+                      <Button className="w-full gap-2">
+                        Schedule Readiness Assessment
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              )}
             </motion.div>
           </div>
 

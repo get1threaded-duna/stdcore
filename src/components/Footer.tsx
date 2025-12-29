@@ -3,12 +3,19 @@ import { Shield, FileCheck, Lock, Heart, Mail, Phone, MapPin, Linkedin, Twitter 
 import { Link } from "react-router-dom";
 import NewsletterSignup from "./NewsletterSignup";
 
-const footerLinks = {
+type FooterLink = {
+  label: string;
+  href: string;
+  isRoute?: boolean;
+  disabled?: boolean;
+};
+
+const footerLinks: Record<string, FooterLink[]> = {
   platform: [
-    { label: "eCTD v4.0 Engine", href: "#" },
-    { label: "Legacy Bridge", href: "#" },
-    { label: "ESG NextGen", href: "#" },
-    { label: "Validation Suite", href: "#" },
+    { label: "eCTD v4.0 Engine", href: "#", disabled: true },
+    { label: "Legacy Bridge", href: "#", disabled: true },
+    { label: "ESG NextGen", href: "#", disabled: true },
+    { label: "Validation Suite", href: "#", disabled: true },
   ],
   resources: [
     { label: "Readiness Calculator", href: "/readiness-calculator", isRoute: true },
@@ -17,16 +24,16 @@ const footerLinks = {
     { label: "Blog", href: "/blog", isRoute: true },
   ],
   regulatory: [
-    { label: "ICH M8 Guidelines", href: "#" },
-    { label: "FDA ESG Requirements", href: "#" },
-    { label: "21 CFR Part 11", href: "#" },
-    { label: "EU CTD Standards", href: "#" },
+    { label: "ICH M8 Guidelines", href: "#", disabled: true },
+    { label: "FDA ESG Requirements", href: "#", disabled: true },
+    { label: "21 CFR Part 11", href: "#", disabled: true },
+    { label: "EU CTD Standards", href: "#", disabled: true },
   ],
   company: [
-    { label: "About Us", href: "#" },
-    { label: "Careers", href: "#" },
+    { label: "About Us", href: "#", disabled: true },
+    { label: "Careers", href: "#", disabled: true },
     { label: "Contact", href: "/contact", isRoute: true },
-    { label: "Press Kit", href: "#" },
+    { label: "Press Kit", href: "#", disabled: true },
   ],
 };
 
@@ -85,14 +92,27 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.platform.map((link) => (
                 <li key={link.label}>
-                  <motion.a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    whileHover={{ x: 4 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {link.label}
-                  </motion.a>
+                  {link.disabled ? (
+                    <span className="text-sm text-muted-foreground/50 cursor-default">
+                      {link.label}
+                    </span>
+                  ) : link.isRoute ? (
+                    <Link
+                      to={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <motion.a
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      whileHover={{ x: 4 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {link.label}
+                    </motion.a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -110,14 +130,27 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
-                  <motion.a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    whileHover={{ x: 4 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {link.label}
-                  </motion.a>
+                  {link.disabled ? (
+                    <span className="text-sm text-muted-foreground/50 cursor-default">
+                      {link.label}
+                    </span>
+                  ) : link.isRoute ? (
+                    <Link
+                      to={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <motion.a
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      whileHover={{ x: 4 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {link.label}
+                    </motion.a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -135,14 +168,27 @@ const Footer = () => {
             <ul className="space-y-3">
               {footerLinks.regulatory.map((link) => (
                 <li key={link.label}>
-                  <motion.a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    whileHover={{ x: 4 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {link.label}
-                  </motion.a>
+                  {link.disabled ? (
+                    <span className="text-sm text-muted-foreground/50 cursor-default">
+                      {link.label}
+                    </span>
+                  ) : link.isRoute ? (
+                    <Link
+                      to={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <motion.a
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      whileHover={{ x: 4 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {link.label}
+                    </motion.a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -176,22 +222,16 @@ const Footer = () => {
             
             {/* Social Links */}
             <div className="flex gap-3 pt-2">
-              <motion.a
-                href="#"
-                className="w-8 h-8 rounded-lg bg-secondary/50 border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-border transition-colors"
-                whileHover={{ scale: 1.1, y: -2 }}
-                whileTap={{ scale: 0.95 }}
+              <div
+                className="w-8 h-8 rounded-lg bg-secondary/30 border border-border/30 flex items-center justify-center text-muted-foreground/50 cursor-default"
               >
                 <Linkedin className="w-4 h-4" />
-              </motion.a>
-              <motion.a
-                href="#"
-                className="w-8 h-8 rounded-lg bg-secondary/50 border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-border transition-colors"
-                whileHover={{ scale: 1.1, y: -2 }}
-                whileTap={{ scale: 0.95 }}
+              </div>
+              <div
+                className="w-8 h-8 rounded-lg bg-secondary/30 border border-border/30 flex items-center justify-center text-muted-foreground/50 cursor-default"
               >
                 <Twitter className="w-4 h-4" />
-              </motion.a>
+              </div>
             </div>
           </motion.div>
         </div>

@@ -13,6 +13,7 @@ import Accessibility from "./pages/Accessibility";
 import FDAOIDs from "./pages/FDAOIDs";
 import Whitepaper from "./pages/Whitepaper";
 import Blog from "./pages/Blog";
+import BlogPostDeterministic from "./pages/BlogPostDeterministic";
 import NotFound from "./pages/NotFound";
 import CookieConsent from "./components/CookieConsent";
 
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/fda-oids" element={<FDAOIDs />} />
           <Route path="/whitepaper" element={<Whitepaper />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/deterministic-vs-probabilistic-regulatory" element={<BlogPostDeterministic />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,17 +1,20 @@
 import { useMemo, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line
 } from "recharts";
-import { format, parseISO, startOfDay, subDays, eachDayOfInterval, isWithinInterval } from "date-fns";
-import { Calendar, Download, Image as ImageIcon } from "lucide-react";
+import { format, parseISO, startOfDay, subDays, eachDayOfInterval, isWithinInterval, differenceInDays } from "date-fns";
+import { Calendar, Image as ImageIcon, TrendingUp, TrendingDown, Minus, BarChart3 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { toPng } from "html-to-image";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface Lead {
   id: string;
@@ -60,10 +63,58 @@ const RISK_RANGES = [
   { name: "$500K+", min: 500000, max: Infinity },
 ];
 
+const ComparisonCard = ({ 
+  title, 
+  current, 
+  previous, 
+  format: formatFn = (v: number) => v.toString() 
+}: { 
+  title: string; 
+  current: number; 
+  previous: number; 
+  format?: (v: number) => string;
+}) => {
+  const change = previous > 0 ? ((current - previous) / previous) * 100 : current > 0 ? 100 : 0;
+  const isPositive = change > 0;
+  const isNeutral = change === 0;
+
+  return (
+    <Card className="bg-card/50 border-border/50">
+      <CardContent className="pt-6">
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">{title}</p>
+          <div className="flex items-end justify-between">
+            <p className="text-2xl font-bold text-foreground">{formatFn(current)}</p>
+            <div className="flex items-center gap-1">
+              {isNeutral ? (
+                <Minus className="h-4 w-4 text-muted-foreground" />
+              ) : isPositive ? (
+                <TrendingUp className="h-4 w-4 text-green-500" />
+              ) : (
+                <TrendingDown className="h-4 w-4 text-red-500" />
+              )}
+              <span className={cn(
+                "text-sm font-medium",
+                isNeutral ? "text-muted-foreground" : isPositive ? "text-green-500" : "text-red-500"
+              )}>
+                {isNeutral ? "0%" : `${isPositive ? "+" : ""}${change.toFixed(1)}%`}
+              </span>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Previous: {formatFn(previous)}
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 const LeadAnalytics = ({ leads }: LeadAnalyticsProps) => {
   const analyticsRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
+  const [showComparison, setShowComparison] = useState(true);
   const [dateRange, setDateRange] = useState<DateRange>({
     from: subDays(new Date(), 29),
     to: new Date(),
@@ -158,6 +209,48 @@ const LeadAnalytics = ({ leads }: LeadAnalyticsProps) => {
       }).length,
     }));
   }, [filteredLeads]);
+
+  // Previous period data for comparison
+  const previousPeriodLeads = useMemo(() => {
+    if (!dateRange.from || !dateRange.to) return [];
+    const periodDays = differenceInDays(dateRange.to, dateRange.from) + 1;
+    const previousStart = subDays(dateRange.from, periodDays);
+    const previousEnd = subDays(dateRange.from, 1);
+    
+    return leads.filter(lead => {
+      const leadDate = parseISO(lead.created_at);
+      return isWithinInterval(leadDate, { 
+        start: startOfDay(previousStart), 
+        end: startOfDay(subDays(previousEnd, -1)) 
+      });
+    });
+  }, [leads, dateRange]);
+
+  // Comparison metrics
+  const comparisonMetrics = useMemo(() => {
+    const currentLeadCount = filteredLeads.length;
+    const previousLeadCount = previousPeriodLeads.length;
+
+    const currentAvgScore = filteredLeads.length > 0 
+      ? filteredLeads.reduce((sum, l) => sum + (l.velocity_score || 0), 0) / filteredLeads.length
+      : 0;
+    const previousAvgScore = previousPeriodLeads.length > 0 
+      ? previousPeriodLeads.reduce((sum, l) => sum + (l.velocity_score || 0), 0) / previousPeriodLeads.length
+      : 0;
+
+    const currentTotalRisk = filteredLeads.reduce((sum, l) => sum + (l.financial_risk || 0), 0);
+    const previousTotalRisk = previousPeriodLeads.reduce((sum, l) => sum + (l.financial_risk || 0), 0);
+
+    const currentHighGrade = filteredLeads.filter(l => l.velocity_grade === 'A' || l.velocity_grade === 'B').length;
+    const previousHighGrade = previousPeriodLeads.filter(l => l.velocity_grade === 'A' || l.velocity_grade === 'B').length;
+
+    return {
+      leadCount: { current: currentLeadCount, previous: previousLeadCount },
+      avgScore: { current: Math.round(currentAvgScore), previous: Math.round(previousAvgScore) },
+      totalRisk: { current: currentTotalRisk, previous: previousTotalRisk },
+      highGradeCount: { current: currentHighGrade, previous: previousHighGrade },
+    };
+  }, [filteredLeads, previousPeriodLeads]);
 
   const handlePresetClick = (days: number) => {
     setDateRange({
@@ -255,7 +348,17 @@ const LeadAnalytics = ({ leads }: LeadAnalyticsProps) => {
                 {filteredLeads.length} leads in range
               </span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="comparison-mode"
+                  checked={showComparison}
+                  onCheckedChange={setShowComparison}
+                />
+                <Label htmlFor="comparison-mode" className="text-sm">
+                  Compare to previous period
+                </Label>
+              </div>
               <Button 
                 variant="outline" 
                 onClick={handleExportImage}
@@ -268,6 +371,33 @@ const LeadAnalytics = ({ leads }: LeadAnalyticsProps) => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Comparison Cards */}
+      {showComparison && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <ComparisonCard
+            title="Total Leads"
+            current={comparisonMetrics.leadCount.current}
+            previous={comparisonMetrics.leadCount.previous}
+          />
+          <ComparisonCard
+            title="Avg. Score"
+            current={comparisonMetrics.avgScore.current}
+            previous={comparisonMetrics.avgScore.previous}
+          />
+          <ComparisonCard
+            title="Total Risk"
+            current={comparisonMetrics.totalRisk.current}
+            previous={comparisonMetrics.totalRisk.previous}
+            format={(v) => `$${(v / 1000).toFixed(0)}K`}
+          />
+          <ComparisonCard
+            title="High Grade (A/B)"
+            current={comparisonMetrics.highGradeCount.current}
+            previous={comparisonMetrics.highGradeCount.previous}
+          />
+        </div>
+      )}
 
       {/* Charts Grid */}
       <div ref={analyticsRef} className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-1">

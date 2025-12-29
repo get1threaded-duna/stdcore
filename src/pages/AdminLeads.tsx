@@ -12,10 +12,11 @@ import LeadDetailModal from "@/components/LeadDetailModal";
 import { 
   LogOut, Download, Search, Filter, Mail, Calendar,
   Building, TrendingUp, Users, DollarSign, RefreshCw, Eye, Send, Trash2,
-  ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, BarChart3
+  ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, BarChart3, FileText
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import LeadAnalytics from "@/components/LeadAnalytics";
+import EmailTemplatesManager from "@/components/EmailTemplatesManager";
 import {
   Select,
   SelectContent,
@@ -91,6 +92,7 @@ const AdminLeads = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [showAnalytics, setShowAnalytics] = useState(true);
+  const [showEmailTemplates, setShowEmailTemplates] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -517,10 +519,16 @@ const AdminLeads = () => {
             <h1 className="text-xl font-bold text-foreground">Calculator Leads</h1>
             <p className="text-sm text-muted-foreground">Admin Dashboard</p>
           </div>
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Logout
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowEmailTemplates(true)}>
+              <FileText className="mr-2 h-4 w-4" />
+              Email Templates
+            </Button>
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -1013,6 +1021,11 @@ const AdminLeads = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <EmailTemplatesManager
+        isOpen={showEmailTemplates}
+        onClose={() => setShowEmailTemplates(false)}
+      />
     </div>
   );
 };

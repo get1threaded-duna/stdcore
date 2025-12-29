@@ -10,6 +10,9 @@ import Cookies from "./pages/Cookies";
 import Security from "./pages/Security";
 import Contact from "./pages/Contact";
 import Accessibility from "./pages/Accessibility";
+import FDAOIDs from "./pages/FDAOIDs";
+import Whitepaper from "./pages/Whitepaper";
+import Blog from "./pages/Blog";
 import NotFound from "./pages/NotFound";
 import CookieConsent from "./components/CookieConsent";
 
@@ -29,6 +32,9 @@ const App = () => (
           <Route path="/security" element={<Security />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/accessibility" element={<Accessibility />} />
+          <Route path="/fda-oids" element={<FDAOIDs />} />
+          <Route path="/whitepaper" element={<Whitepaper />} />
+          <Route path="/blog" element={<Blog />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

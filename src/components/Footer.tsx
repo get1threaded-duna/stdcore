@@ -11,10 +11,10 @@ const footerLinks = {
     { label: "Validation Suite", href: "#" },
   ],
   resources: [
+    { label: "Readiness Calculator", href: "/readiness-calculator", isRoute: true },
     { label: "FDA OID Reference", href: "/fda-oids", isRoute: true },
     { label: "Whitepaper", href: "/whitepaper", isRoute: true },
     { label: "Blog", href: "/blog", isRoute: true },
-    { label: "Documentation", href: "#" },
   ],
   regulatory: [
     { label: "ICH M8 Guidelines", href: "#" },

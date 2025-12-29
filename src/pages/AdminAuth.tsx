@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, LogIn } from "lucide-react";
+import { Shield, LogIn, UserPlus } from "lucide-react";
 import { Session, User } from "@supabase/supabase-js";
 
 const AdminAuth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
@@ -59,49 +60,81 @@ const AdminAuth = () => {
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        toast({
-          title: "Login Failed",
-          description: error.message,
-          variant: "destructive",
+      if (isSignUp) {
+        // Sign up flow
+        const redirectUrl = `${window.location.origin}/admin`;
+        
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: redirectUrl
+          }
         });
-        return;
-      }
 
-      if (data.user) {
-        // Check if user is admin
-        const { data: roleData, error: roleError } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', data.user.id)
-          .eq('role', 'admin')
-          .maybeSingle();
-
-        if (roleError || !roleData) {
+        if (error) {
           toast({
-            title: "Access Denied",
-            description: "You do not have admin privileges.",
+            title: "Sign Up Failed",
+            description: error.message,
             variant: "destructive",
           });
-          await supabase.auth.signOut();
           return;
         }
 
-        toast({
-          title: "Welcome",
-          description: "Successfully logged in as admin.",
+        if (data.user) {
+          toast({
+            title: "Account Created",
+            description: "Your account has been created. Please contact an administrator to grant you admin access.",
+          });
+          // Switch to login mode
+          setIsSignUp(false);
+        }
+      } else {
+        // Login flow
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
         });
-        navigate('/admin/leads');
+
+        if (error) {
+          toast({
+            title: "Login Failed",
+            description: error.message,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (data.user) {
+          // Check if user is admin
+          const { data: roleData, error: roleError } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', data.user.id)
+            .eq('role', 'admin')
+            .maybeSingle();
+
+          if (roleError || !roleData) {
+            toast({
+              title: "Access Denied",
+              description: "You do not have admin privileges. Please contact an administrator.",
+              variant: "destructive",
+            });
+            await supabase.auth.signOut();
+            return;
+          }
+
+          toast({
+            title: "Welcome",
+            description: "Successfully logged in as admin.",
+          });
+          navigate('/admin/leads');
+        }
       }
     } catch (error) {
       toast({
@@ -121,13 +154,17 @@ const AdminAuth = () => {
           <div className="mx-auto mb-4 p-3 rounded-full bg-primary/10 w-fit">
             <Shield className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold text-foreground">Admin Login</CardTitle>
+          <CardTitle className="text-2xl font-bold text-foreground">
+            {isSignUp ? "Create Admin Account" : "Admin Login"}
+          </CardTitle>
           <CardDescription className="text-muted-foreground">
-            Access the calculator leads dashboard
+            {isSignUp 
+              ? "Sign up to request admin access" 
+              : "Access the calculator leads dashboard"}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground">Email</Label>
               <Input
@@ -149,6 +186,7 @@ const AdminAuth = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
                 className="bg-secondary/50 border-border"
               />
             </div>
@@ -158,15 +196,36 @@ const AdminAuth = () => {
               disabled={isLoading}
             >
               {isLoading ? (
-                "Signing in..."
+                isSignUp ? "Creating account..." : "Signing in..."
               ) : (
                 <>
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Sign In
+                  {isSignUp ? (
+                    <>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Sign Up
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Sign In
+                    </>
+                  )}
                 </>
               )}
             </Button>
           </form>
+          
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm text-primary hover:underline"
+            >
+              {isSignUp 
+                ? "Already have an account? Sign in" 
+                : "Need an account? Sign up"}
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>

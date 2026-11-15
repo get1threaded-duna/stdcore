@@ -1,6 +1,13 @@
+# PRE-LAUNCH: indexing disabled on purpose.
+# The site is on a *.workers.dev preview URL, the brand name is not final, and
+# the contact details in the footer/legal pages are placeholders that do not
+# resolve. Do not allow crawling until the real domain and contacts are set.
+#
+# AT LAUNCH, replace this whole file with:
+#   User-agent: *
+#   Allow: /
+#   Disallow: /admin
+#   Disallow: /admin/leads
+#   Sitemap: https://<real-domain>/sitemap.xml
 User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /admin/leads
-
-Sitemap: https://standardcore.com/sitemap.xml
+Disallow: /

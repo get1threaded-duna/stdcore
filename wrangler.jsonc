@@ -1,6 +1,9 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "stdcore-landing",
+  // Pinned to the StandardCore Cloudflare account so a deploy cannot land in
+  // another account. Verify with `npx wrangler whoami` if this ever errors.
+  "account_id": "6fc7152072350c7ca7026cef91984cc8",
   "compatibility_date": "2026-11-15",
   "assets": {
     "directory": "./dist",

@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { EMAILS } from "@/config/site";
 
 const Whitepaper = () => {
   return (
@@ -569,7 +570,7 @@ const Whitepaper = () => {
               <p className="text-sm text-muted-foreground">
                 This whitepaper was authored by the StandardCore Regulatory Science team, with contributions from 
                 former FDA reviewers, pharmaceutical regulatory affairs executives, and computer system validation experts. 
-                For citations or media inquiries, contact <a href="mailto:press@standardcore.com" className="text-primary hover:underline">press@standardcore.com</a>.
+                For citations or media inquiries, contact <a href={`mailto:${EMAILS.press}`} className="text-primary hover:underline">{EMAILS.press}</a>.
               </p>
             </div>
           </motion.div>

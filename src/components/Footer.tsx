@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Shield, FileCheck, Lock, Heart, Mail, Phone, MapPin, Linkedin, Twitter } from "lucide-react";
 import { Link } from "react-router-dom";
 import NewsletterSignup from "./NewsletterSignup";
+import { EMAILS } from "@/config/site";
 
 type FooterLink = {
   label: string;
@@ -206,8 +207,8 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <a href="mailto:regulatory@standardcore.com" className="hover:text-foreground transition-colors">
-                  regulatory@standardcore.com
+                <a href={`mailto:${EMAILS.regulatory}`} className="hover:text-foreground transition-colors">
+                  {EMAILS.regulatory}
                 </a>
               </li>
               <li className="flex items-start gap-2 text-sm text-muted-foreground">

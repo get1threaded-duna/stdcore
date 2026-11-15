@@ -126,8 +126,8 @@ const DemoSection = () => {
 
                 <p className="text-xs text-muted-foreground text-center lg:text-left">
                   Contact{" "}
-                  <a href="mailto:enterprise@standardcore.com" className="text-primary hover:underline">
-                    enterprise@standardcore.com
+                  <a href={`mailto:${EMAILS.enterprise}`} className="text-primary hover:underline">
+                    {EMAILS.enterprise}
                   </a>
                   {" "}for enterprise licensing and custom deployments.
                 </p>

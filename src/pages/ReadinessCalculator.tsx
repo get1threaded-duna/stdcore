@@ -12,6 +12,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { SITE_URL } from "@/config/site";
 
 type DataArchitecture = "legacy-xml" | "hybrid" | "relational";
 
@@ -151,7 +152,7 @@ const ReadinessCalculator = () => {
   }, [inputs]);
 
   const handleCopyCitation = () => {
-    const citation = `StandardCore. (2024). eCTD v4.0 Readiness & Risk Calculator [Online Tool]. Retrieved ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} from https://standardcore.com/readiness-calculator`;
+    const citation = `StandardCore. (2024). eCTD v4.0 Readiness & Risk Calculator [Online Tool]. Retrieved ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} from ${SITE_URL}/readiness-calculator`;
     navigator.clipboard.writeText(citation);
     setCopied(true);
     toast({
@@ -726,7 +727,7 @@ const ReadinessCalculator = () => {
               <div className="bg-background/50 rounded-xl p-4 font-mono text-sm text-foreground border border-border/50 mb-4">
                 <p>StandardCore. (2024). <em>eCTD v4.0 Readiness & Risk Calculator</em> [Online Tool].</p>
                 <p>Retrieved {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} from</p>
-                <p className="text-primary">https://standardcore.com/readiness-calculator</p>
+                <p className="text-primary">${SITE_URL}/readiness-calculator</p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
@@ -746,7 +747,7 @@ const ReadinessCalculator = () => {
                   For web publications and digital reports, use this embed code:
                 </p>
                 <div className="bg-background/50 rounded-lg p-3 font-mono text-xs text-muted-foreground overflow-x-auto">
-                  {`<a href="https://standardcore.com/readiness-calculator" title="eCTD v4.0 Readiness Calculator">eCTD v4.0 Readiness & Risk Calculator</a> by <a href="https://standardcore.com">StandardCore</a>`}
+                  {`<a href="${SITE_URL}/readiness-calculator" title="eCTD v4.0 Readiness Calculator">eCTD v4.0 Readiness & Risk Calculator</a> by <a href="${SITE_URL}">StandardCore</a>`}
                 </div>
               </div>
             </div>

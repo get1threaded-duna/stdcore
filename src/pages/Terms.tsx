@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import NavigationHeader from "@/components/NavigationHeader";
 import Footer from "@/components/Footer";
 import { FileCheck } from "lucide-react";
+import { EMAILS } from "@/config/site";
 
 const Terms = () => {
   return (
@@ -87,7 +88,7 @@ const Terms = () => {
                 StandardCore, Inc.<br />
                 Legal Department<br />
                 Cambridge, MA 02142<br />
-                Email: legal@standardcore.com
+                Email: {EMAILS.legal}
               </p>
             </section>
           </div>

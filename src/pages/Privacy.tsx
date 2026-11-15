@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import NavigationHeader from "@/components/NavigationHeader";
 import Footer from "@/components/Footer";
 import { Shield } from "lucide-react";
+import { EMAILS } from "@/config/site";
 
 const Privacy = () => {
   return (
@@ -62,7 +63,7 @@ const Privacy = () => {
             <section>
               <h2 className="text-2xl font-semibold text-foreground mb-4">6. Your Rights</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Depending on your jurisdiction, you may have rights to access, correct, delete, or export your personal data. Enterprise customers may exercise these rights through their designated account administrator or by contacting our Data Protection Officer at privacy@standardcore.com.
+                Depending on your jurisdiction, you may have rights to access, correct, delete, or export your personal data. Enterprise customers may exercise these rights through their designated account administrator or by contacting our Data Protection Officer at {EMAILS.privacy}.
               </p>
             </section>
 
@@ -73,7 +74,7 @@ const Privacy = () => {
                 StandardCore, Inc.<br />
                 Attn: Data Protection Officer<br />
                 Cambridge, MA 02142<br />
-                Email: privacy@standardcore.com
+                Email: {EMAILS.privacy}
               </p>
             </section>
           </div>

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import NavigationHeader from "@/components/NavigationHeader";
 import Footer from "@/components/Footer";
 import { Cookie } from "lucide-react";
+import { EMAILS } from "@/config/site";
 
 const Cookies = () => {
   return (
@@ -94,7 +95,7 @@ const Cookies = () => {
               <h2 className="text-2xl font-semibold text-foreground mb-4">8. Contact</h2>
               <p className="text-muted-foreground leading-relaxed">
                 For questions about our cookie practices:<br />
-                Email: privacy@standardcore.com
+                Email: {EMAILS.privacy}
               </p>
             </section>
           </div>

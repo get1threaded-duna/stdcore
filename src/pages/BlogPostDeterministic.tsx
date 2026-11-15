@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { EMAILS } from "@/config/site";
 
 const BlogPostDeterministic = () => {
   return (
@@ -291,8 +292,8 @@ const BlogPostDeterministic = () => {
                 The StandardCore Regulatory Science team comprises former FDA reviewers, pharmaceutical regulatory affairs 
                 executives, and computer system validation specialists. Our research focuses on the intersection of regulatory 
                 requirements and technology architecture. For inquiries regarding this analysis, contact{" "}
-                <a href="mailto:regulatory-science@standardcore.com" className="text-primary hover:underline">
-                  regulatory-science@standardcore.com
+                <a href={`mailto:${EMAILS.regulatoryScience}`} className="text-primary hover:underline">
+                  {EMAILS.regulatoryScience}
                 </a>.
               </p>
             </div>

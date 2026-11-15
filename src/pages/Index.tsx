@@ -8,6 +8,7 @@ import DemoSection from "@/components/DemoSection";
 import FAQSection from "@/components/FAQSection";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
+import { SITE_URL, EMAILS, SOCIAL_PROFILES } from "@/config/site";
 
 const Index = () => {
   // Organization JSON-LD schema
@@ -15,17 +16,16 @@ const Index = () => {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "StandardCore",
-    "url": "https://standardcore.com",
-    "logo": "https://standardcore.com/logo.png",
+    "url": SITE_URL,
+    "logo": "`${SITE_URL}/logo.png`",
     "description": "Deterministic Engine for eCTD v4.0 & ESG NextGen - Standardized infrastructure for regulatory document lifecycles",
-    "sameAs": [
-      "https://twitter.com/StandardCore",
-      "https://linkedin.com/company/standardcore"
-    ],
+    // sameAs omitted until real, owned social profiles exist. Listing handles
+    // the company does not control misrepresents identity to search engines.
+    ...(SOCIAL_PROFILES.length ? { sameAs: SOCIAL_PROFILES } : {}),
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "sales",
-      "email": "contact@standardcore.com"
+      "email": EMAILS.enterprise
     }
   };
 
@@ -34,17 +34,14 @@ const Index = () => {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "StandardCore",
-    "url": "https://standardcore.com",
+    "url": SITE_URL,
     "description": "Standardized infrastructure for the transition from hierarchical folders to relational document lifecycles. 100% Traceability. Zero-Hallucination Mapping.",
     "publisher": {
       "@type": "Organization",
       "name": "StandardCore"
     },
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://standardcore.com/search?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
+    // SearchAction removed: the app has no /search route, so advertising one
+    // tells Google about a page that 404s (well, soft-404s via SPA fallback).
   };
 
   // BreadcrumbList JSON-LD schema
@@ -56,31 +53,31 @@ const Index = () => {
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://standardcore.com"
+        "item": SITE_URL
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Platform",
-        "item": "https://standardcore.com/#platform"
+        "item": `${SITE_URL}/#platform`
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": "Solutions",
-        "item": "https://standardcore.com/#solutions"
+        "item": `${SITE_URL}/#solutions`
       },
       {
         "@type": "ListItem",
         "position": 4,
         "name": "Resources",
-        "item": "https://standardcore.com/#resources"
+        "item": `${SITE_URL}/#resources`
       },
       {
         "@type": "ListItem",
         "position": 5,
         "name": "Pricing",
-        "item": "https://standardcore.com/#pricing"
+        "item": `${SITE_URL}/#pricing`
       }
     ]
   };

@@ -1,9 +1,10 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "stdcore-landing",
-  // Pinned to the StandardCore Cloudflare account so a deploy cannot land in
-  // another account. Verify with `npx wrangler whoami` if this ever errors.
-  "account_id": "6fc7152072350c7ca7026cef91984cc8",
+  // TODO: pin to the StandardCore account id once `wrangler whoami` lists it.
+  // Deliberately NOT set to 6fc7152072350c7ca7026cef91984cc8 — that is the
+  // Get1threaded account, which must not host StandardCore infrastructure.
+  // "account_id": "<standardcore-account-id>",
   "compatibility_date": "2026-11-15",
   "assets": {
     "directory": "./dist",

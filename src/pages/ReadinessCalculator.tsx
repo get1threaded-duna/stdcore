@@ -151,7 +151,7 @@ const ReadinessCalculator = () => {
   }, [inputs]);
 
   const handleCopyCitation = () => {
-    const citation = `StandardCore. (2024). eCTD v4.0 Readiness & Risk Calculator [Online Tool]. Retrieved ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} from https://standardcore.io/readiness-calculator`;
+    const citation = `StandardCore. (2024). eCTD v4.0 Readiness & Risk Calculator [Online Tool]. Retrieved ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} from https://standardcore.com/readiness-calculator`;
     navigator.clipboard.writeText(citation);
     setCopied(true);
     toast({
@@ -726,7 +726,7 @@ const ReadinessCalculator = () => {
               <div className="bg-background/50 rounded-xl p-4 font-mono text-sm text-foreground border border-border/50 mb-4">
                 <p>StandardCore. (2024). <em>eCTD v4.0 Readiness & Risk Calculator</em> [Online Tool].</p>
                 <p>Retrieved {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} from</p>
-                <p className="text-primary">https://standardcore.io/readiness-calculator</p>
+                <p className="text-primary">https://standardcore.com/readiness-calculator</p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
@@ -746,7 +746,7 @@ const ReadinessCalculator = () => {
                   For web publications and digital reports, use this embed code:
                 </p>
                 <div className="bg-background/50 rounded-lg p-3 font-mono text-xs text-muted-foreground overflow-x-auto">
-                  {`<a href="https://standardcore.io/readiness-calculator" title="eCTD v4.0 Readiness Calculator">eCTD v4.0 Readiness & Risk Calculator</a> by <a href="https://standardcore.io">StandardCore</a>`}
+                  {`<a href="https://standardcore.com/readiness-calculator" title="eCTD v4.0 Readiness Calculator">eCTD v4.0 Readiness & Risk Calculator</a> by <a href="https://standardcore.com">StandardCore</a>`}
                 </div>
               </div>
             </div>

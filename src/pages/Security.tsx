@@ -119,7 +119,7 @@ const Security = () => {
               <h2 className="text-2xl font-semibold text-foreground mb-4">Security Contact</h2>
               <p className="text-muted-foreground leading-relaxed">
                 To report security vulnerabilities or for security-related inquiries:<br />
-                Email: security@standardcore.io<br />
+                Email: security@standardcore.com<br />
                 PGP Key: Available upon request
               </p>
             </section>

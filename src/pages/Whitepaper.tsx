@@ -569,7 +569,7 @@ const Whitepaper = () => {
               <p className="text-sm text-muted-foreground">
                 This whitepaper was authored by the StandardCore Regulatory Science team, with contributions from 
                 former FDA reviewers, pharmaceutical regulatory affairs executives, and computer system validation experts. 
-                For citations or media inquiries, contact <a href="mailto:press@standardcore.io" className="text-primary hover:underline">press@standardcore.io</a>.
+                For citations or media inquiries, contact <a href="mailto:press@standardcore.com" className="text-primary hover:underline">press@standardcore.com</a>.
               </p>
             </div>
           </motion.div>

@@ -206,8 +206,8 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <a href="mailto:regulatory@standardcore.io" className="hover:text-foreground transition-colors">
-                  regulatory@standardcore.io
+                <a href="mailto:regulatory@standardcore.com" className="hover:text-foreground transition-colors">
+                  regulatory@standardcore.com
                 </a>
               </li>
               <li className="flex items-start gap-2 text-sm text-muted-foreground">

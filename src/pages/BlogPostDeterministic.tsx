@@ -291,8 +291,8 @@ const BlogPostDeterministic = () => {
                 The StandardCore Regulatory Science team comprises former FDA reviewers, pharmaceutical regulatory affairs 
                 executives, and computer system validation specialists. Our research focuses on the intersection of regulatory 
                 requirements and technology architecture. For inquiries regarding this analysis, contact{" "}
-                <a href="mailto:regulatory-science@standardcore.io" className="text-primary hover:underline">
-                  regulatory-science@standardcore.io
+                <a href="mailto:regulatory-science@standardcore.com" className="text-primary hover:underline">
+                  regulatory-science@standardcore.com
                 </a>.
               </p>
             </div>

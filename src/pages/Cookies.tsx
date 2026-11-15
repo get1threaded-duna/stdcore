@@ -94,7 +94,7 @@ const Cookies = () => {
               <h2 className="text-2xl font-semibold text-foreground mb-4">8. Contact</h2>
               <p className="text-muted-foreground leading-relaxed">
                 For questions about our cookie practices:<br />
-                Email: privacy@standardcore.io
+                Email: privacy@standardcore.com
               </p>
             </section>
           </div>

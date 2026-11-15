@@ -87,7 +87,7 @@ const Terms = () => {
                 StandardCore, Inc.<br />
                 Legal Department<br />
                 Cambridge, MA 02142<br />
-                Email: legal@standardcore.io
+                Email: legal@standardcore.com
               </p>
             </section>
           </div>

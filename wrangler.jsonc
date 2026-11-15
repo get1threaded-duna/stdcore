@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "stdcore-landing",
+  "compatibility_date": "2026-11-15",
+  "assets": {
+    "directory": "./dist",
+    // SPA, not a static multi-page site: every unmatched path must serve
+    // index.html so React Router can handle /readiness-calculator, /admin, etc.
+    "not_found_handling": "single-page-application",
+    "html_handling": "auto-trailing-slash"
+  }
+}

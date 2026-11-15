@@ -5,7 +5,7 @@ import DeterministicToggle from "./DeterministicToggle";
 import ComplianceRibbon from "./ComplianceRibbon";
 
 // External Utility Project URL
-const UTILITY_APP_URL = "https://id-preview--1c7bab28-ee3b-47e1-9fa7-54c85e1eddaf.lovable.app";
+import { UTILITY_APP_URL } from "@/config/site";
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex flex-col">

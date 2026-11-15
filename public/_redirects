@@ -1,0 +1,7 @@
+# Legacy / alias paths -> canonical pages (preserves any existing search equity)
+/part-11       /21-cfr-part-11        301
+/ich-m8        /ich-m8-guidelines     301
+/eu-ctd        /eu-ctd-standards      301
+/calculator    /readiness-calculator  301
+/fda-oid       /fda-oids              301
+# NOTE: add "/vault  https://app.standardcore.com/  301" once that domain exists.

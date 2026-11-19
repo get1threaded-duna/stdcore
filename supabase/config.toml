@@ -2,3 +2,27 @@ project_id = "fjfxbgyywabrubgaorwz"
 
 [functions.send-lead-email]
 verify_jwt = true
+
+[auth]
+enabled = true
+# standardcore.com is not owned yet (see src/config/site.ts); switch when the domain is live.
+site_url = "https://stdcore-landing.standardcore.workers.dev"
+additional_redirect_urls = [
+  "https://stdcore-landing.standardcore.workers.dev/**",
+  "http://localhost:8080/**",
+]
+# Admin account exists; no public sign-ups.
+enable_signup = false
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+max_frequency = "1m0s"
+otp_length = 8
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[storage.vector]
+enabled = false

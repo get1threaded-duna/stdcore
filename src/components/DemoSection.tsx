@@ -5,7 +5,7 @@ import ScrollReveal from "./animations/ScrollReveal";
 import UtilityScreenshot from "./UtilityScreenshot";
 
 // External Utility Project URL
-import { UTILITY_APP_URL } from "@/config/site";
+import { EMAILS, UTILITY_APP_URL } from "@/config/site";
 
 const DemoSection = () => {
   return (

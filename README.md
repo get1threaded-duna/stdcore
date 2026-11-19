@@ -1,73 +1,99 @@
-# Welcome to your Lovable project
+# StandardCore
 
-## Project info
+Marketing site and lead capture for StandardCore: regulatory submission readiness for
+life-sciences teams (FDA ESG, eCTD, 21 CFR Part 11, ICH M8). It includes a Readiness
+Calculator that records leads, and a small admin area for reviewing and emailing them.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Live preview (pre-launch, not indexed): https://stdcore-landing.standardcore.workers.dev
 
-## How can I edit this code?
+## Stack
 
-There are several ways of editing your application.
+- **Frontend:** Vite, React, TypeScript, Tailwind CSS, shadcn/ui, React Router (single-page app)
+- **Backend:** Supabase (Postgres with row-level security, Auth, and an Edge Function)
+- **Hosting:** Cloudflare Workers static assets, deployed with Wrangler
+- **Email:** Resend, called from the `send-lead-email` Edge Function
 
-**Use Lovable**
+## Local development
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Requires Node.js and npm.
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+npm install
+cp .env.example .env   # then fill in the Supabase values below
+npm run dev            # http://localhost:8080
 ```
 
-**Edit a file directly in GitHub**
+### Environment variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+| Variable | Purpose |
+|---|---|
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_PROJECT_ID` | Supabase project ref |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase anon (public) key; row-level security is the real access boundary |
+| `VITE_UTILITY_APP_URL` | Optional. URL for the platform app call-to-action (default set in `src/config/site.ts`) |
 
-**Use GitHub Codespaces**
+`VITE_*` values are compiled into the bundle at build time, so changing them requires a rebuild
+and redeploy. Never put the Supabase service-role key in `.env`.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Scripts
 
-## What technologies are used for this project?
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server with hot reload |
+| `npm run build` | Production build to `dist/` |
+| `npm run preview` | Serve the production build locally |
+| `npm run lint` | ESLint |
 
-This project is built with:
+## Deploying
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```sh
+npm run build
+npx wrangler deploy
+```
 
-## How can I deploy this project?
+`wrangler.jsonc` pins the Cloudflare account and serves `dist/` with single-page-app fallback,
+so deep links such as `/readiness-calculator` survive a refresh.
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## Supabase
 
-## Can I connect a custom domain to my Lovable project?
+Schema, policies and the Edge Function live in `supabase/`. Auth settings (site URL, redirect
+URLs, sign-up disabled) are tracked in `supabase/config.toml`.
 
-Yes, you can!
+```sh
+supabase link --project-ref <project-ref>
+supabase db push                          # apply migrations in supabase/migrations
+supabase config push                      # apply config.toml; run it in a real terminal and review the diff
+supabase functions deploy send-lead-email
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+The Edge Function needs `RESEND_API_KEY` set as a Supabase secret, and a sending domain
+verified in Resend.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Admin access
+
+Public sign-up is disabled. To add an admin, create the user in the Supabase dashboard
+(Authentication → Users), then run:
+
+```sql
+insert into public.user_roles (user_id, role) values ('<user-uuid>', 'admin');
+```
+
+## Project layout
+
+```
+src/
+  pages/                 Route components (marketing pages, calculator, admin)
+  components/            Shared components; shadcn/ui primitives in components/ui
+  config/site.ts         Domain, URLs and contact addresses (single source of truth)
+  integrations/supabase  Supabase client and generated types
+supabase/
+  migrations/            Database schema and row-level security policies
+  functions/             send-lead-email Edge Function
+public/                  Static files, robots.txt, sitemap.xml, Cloudflare _headers/_redirects
+```
+
+## Before launch
+
+- Set the real domain in `src/config/site.ts` and `supabase/config.toml` (`standardcore.com` is a placeholder that isn't owned yet)
+- Add spam protection, such as Cloudflare Turnstile, to the Readiness Calculator
+- Re-enable indexing: replace `public/robots.txt` as its comments describe, and remove the `X-Robots-Tag` line from `public/_headers`
